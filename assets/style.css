@@ -1,0 +1,214 @@
+.welcome{
+    font-size: 60px;
+    font-weight: bold;
+    text-align: center;
+    height: 150px;
+    width: 100vw;
+    padding-top: 75px;
+    margin-bottom: 40px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.welcome-links{
+    margin-top: 50px;
+    columns: 3;
+    text-align: center;
+}
+@media only screen and (max-width: 600px) {
+    .welcome-links {
+      columns: 1;
+    }
+    .welcome{
+        font-size: 50px;
+    }
+  }
+.welcome-links>a>i{
+    font-size: 100px;
+}
+.container:active{
+    border: none;
+}
+textarea:focus, input:focus{
+    outline: none;
+}
+*:focus {
+    outline: none;
+}
+.aboutus{
+  background-image: url("/assets/images/teamphoto.jpg");
+  height: 50vh;
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 100%;
+  text-align: center;
+  margin-top: 100px;
+  border-radius: 25px
+}
+.aboutus>h1{
+    margin-top: 15vh;
+    color: white;
+    font-weight: bold;
+}
+.kiosk-container{
+    margin-top: 30px;
+}
+.side-number{
+    color: #7DC834;
+    font-weight: bold;
+
+}
+.sidenote{
+    margin-bottom: 15px;
+}
+.side-icon{
+    font-family: "Material Icons";
+    color: #7DC834;
+}
+label {
+    -webkit-touch-callout: none; /* iOS Safari */
+      -webkit-user-select: none; /* Safari */
+       -khtml-user-select: none; /* Konqueror HTML */
+         -moz-user-select: none; /* Old versions of Firefox */
+          -ms-user-select: none; /* Internet Explorer/Edge */
+              user-select: none; /* Non-prefixed version, currently
+                                    supported by Chrome, Edge, Opera and Firefox */
+  }
+  .add-button {
+    position: absolute;
+    top: 1px;
+    left: 1px;
+  }
+button:focus{
+    outline: 0 !important;
+}
+.teamcheck{
+    columns: 2;
+}
+@media only screen and (max-width: 600px) {
+    .teamcheck {
+      columns: 1;
+    }
+  }
+.loading{
+    height: 50vh;
+    text-align:center;
+    margin-top: 10vh;
+}
+.matchnumber{
+    font-size: 50px;
+    font-weight: light;
+}
+.matchdetails{
+    padding: 10px;
+    padding-left: 40px;
+    color: black;
+    cursor: pointer;
+}
+.mdc-list-item{
+    margin-bottom: 10px;
+}
+.mdc-card{
+    margin: 16px;
+}
+.mdc-card-text{
+    margin: 14px;
+    margin-bottom: 0px;
+}
+.field-button{
+    vertical-align:sub;
+}
+html {
+    font-family: sans-serif;
+    line-height: 1.15;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  }
+.mdc-data-table{
+    overflow: scroll !important;
+    width: 100%;
+}
+.dashboard-table{
+    max-height: 300px;
+}
+.match-number{
+    font-weight: bold;
+    text-align: center;
+}
+div.fade{
+    animation-name: fadeall;
+    animation-duration: 0.1s;
+}
+.fade-in{
+    animation-name: fadealt;
+    animation-duration: 0.1s;
+}
+@keyframes fadeall{
+    from{color: black;}
+    to{color: white}
+}
+.offline{
+    display:block;
+    align-self:center;
+    margin-left: auto;
+    margin-right: auto;
+    width: 70vw;
+    max-width: 600px;
+}
+
+.scouting-form{
+    z-index: 6;
+    display: none;
+    width: 100vw;
+    height: 100vh;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    background-color: white;
+    animation-name: form-zoom;
+    animation-duration: 0.2s;
+}
+@keyframes form-zoom {
+    from {transform: scale(0); width: 0; height: 0; top: 50vh; left: 50vw; border-radius: 50%; background-color: lightgray; display: none;}
+    to {transform: initial; width: 100vw; height: 100vh; top: 0; left: 0; border-radius: 0; background-color: white; display: block;}
+}
+/* fallback */
+@font-face {
+    font-family: 'Material Icons';
+    font-style: normal;
+    font-weight: 400;
+    src: url(/assets/icons.woff2) format('woff2');
+  }
+  
+  .material-icons {
+    font-family: 'Material Icons';
+    font-weight: normal;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -moz-font-feature-settings: 'liga';
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: initial;
+  }
+.standRow{
+    margin: 15px;
+}
+.noselect{
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
