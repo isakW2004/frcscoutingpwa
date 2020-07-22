@@ -12,7 +12,7 @@
     </a>
     <a href="data.php" class="mdc-ripple-surface--primary">
         <i class="material-icons">trending_up</i>
-        <h2>View Data</h2>
+        <h2>View  Data</h2>
     </a>
     </div><br>
 <noscript class="text-center">
