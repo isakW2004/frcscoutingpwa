@@ -14,12 +14,11 @@
   <link rel="stylesheet" href="/assets/bootstrapcustom.min.css">
   <link href="/assets/material.css" rel="stylesheet">
   <script type="text/javascript" src="/assets/material.js"></script>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <link rel="stylesheet" href="/assets/style.css">
   <script type="text/javascript" src="/assets/sitewide.js"></script>
   <meta name="description" content="Scouting and more for FRC Team 2530">
   <script type="text/javascript" src="/assets/jquery.js"></script>
-  <script type="text/javascript" src="/assets/darkmode.js"></script>
+  <meta name="color-scheme" content="dark light">
 </head>
 <script>
 //service worker for Progressive Web App mode
@@ -46,24 +45,24 @@ if ('serviceWorker' in navigator) {
             <nav class="mdc-list" data-mdc-auto-init="MDCList">
               <a class="mdc-list-item <?php if ($title == "Home"){echo "mdc-list-item--activated";}?>" href="/" aria-current="page" tabindex="0">
                 <i class="material-icons mdc-list-item__graphic" aria-hidden="true">home</i>
-                <span class="mdc-list-item__text">Home</span>
+                <span class="mdc-list-item__text drawer_text">Home</span>
               </a>
               <a class="mdc-list-item <?php if ($title == "Scouting"){echo "mdc-list-item--activated";}?>" href="scout.php">
                 <i class="material-icons mdc-list-item__graphic" aria-hidden="true">search</i>
-                <span class="mdc-list-item__text">Scouting</span>
+                <span class="mdc-list-item__text drawer_text">Scouting</span>
               </a>
               <a class="mdc-list-item <?php if ($title == "Kiosk"){echo "mdc-list-item--activated";}?>" href="kiosk.php">
                 <i class="material-icons mdc-list-item__graphic" aria-hidden="true">dock</i>
-                <span class="mdc-list-item__text">Pit Kiosk Mode</span>
+                <span class="mdc-list-item__text drawer_text">Pit Kiosk Mode</span>
               </a>
                 <a class="mdc-list-item <?php if ($title == "Data"){echo "mdc-list-item--activated";}?>" href="data.php">
                   <i class="material-icons mdc-list-item__graphic" aria-hidden="true">trending_up</i>
-                  <span class="mdc-list-item__text">View Data</span>
+                  <span class="mdc-list-item__text drawer_text">View Data</span>
                 </a>
                 <hr class="mdc-list-divider">
                 <a class="mdc-list-item <?php if ($title == "Settings"){echo "mdc-list-item--activated";}?>" href="settings.php">
                   <i class="material-icons mdc-list-item__graphic" aria-hidden="true">settings</i>
-                  <span class="mdc-list-item__text">Settings</span>
+                  <span class="mdc-list-item__text drawer_text">Settings</span>
                 </a>
                 <h6 class="mdc-list-group__subheader">FRC Team 2530</h6>
     </nav>
@@ -76,22 +75,19 @@ if ('serviceWorker' in navigator) {
           <header class="mdc-top-app-bar drawer-top-app-bar head" data-mdc-auto-init="MDCTopAppBar" id="app-bar">
             <div class="mdc-top-app-bar__row">
               <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
-                <button href="#" class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" data-mdc-auto-init="MDCRipple">menu</button>
-                <span class="mdc-top-app-bar__title"><?php echo "$header";?></span>
+                <button href="#" class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" data-mdc-auto-init="MDCRipple" id="menuButton">menu</button>
+                <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Change Event" onclick="teamView.close()" id="backButton" hidden>arrow_back</button>
+                <span class="mdc-top-app-bar__title" id="title"><?php echo "$header";?></span>
               </section>
               <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
                   <?php if ($title == "Kiosk"){?>
-                  <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Hide App Bar" onclick="document.getElementById('app-bar').style.display = 'none'">visibility_off</button>
+                  <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Hide App Bar" onclick="document.getElementById('app-bar').style.display = 'none'; document.getElementById('qr').scrollIntoView(); document.getElementById('qr').classList.add('hinting')">visibility_off</button>
+                  <?php }?>
+                  <?php if ($title == "Data"){?>
+                  <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" id="favoriteButton" aria-label="Favorite Team" hidden onclick="favoriteTeam()">favorite_outline</button>
                   <?php }?>
                   <div id="toolbar" class="toolbar mdc-menu-surface--anchor">
-                  <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Change Event" onclick="openEventPicker();">event</button>
-                    <div class="mdc-menu mdc-menu-surface">
-                      <ul class="mdc-list" role="menu" aria-hidden="true" aria-orientation="vertical" tabindex="-1" id="eventList">
-                        <li class="mdc-list-item" role="menuitem">
-                          <span class="mdc-list-item__text">Fetch Events</span>
-                        </li>
-                      </ul>
-                    </div>
+                  <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Change Event"  id='eventButton' onclick="openEventPicker();">event</button>
                     </div>
                   <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Get Help" onclick="helpWindow.open()">help</button>
                 </div>
@@ -156,9 +152,4 @@ if ('serviceWorker' in navigator) {
             mainContentEl.querySelector('input, button').focus();
           });
           const eventPicker = new mdc.dialog.MDCDialog(document.querySelector('.mdc-dialog'));
-          if(getCookie("darkmode") == "true"){
-            DarkReader.enable();
-          }else{
-            DarkReader.disable();
-          }
 </script>

@@ -2,15 +2,17 @@ var CACHE_NAME = '2530events';
 var urlsToCache = [
   '/',
   '/assets/material.css',
-  'https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css',
-  'https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js',
-  'https://fonts.googleapis.com/icon?family=Material+Icons',
+  '/assets/bootstrapcustom.min.css',
+  '/assets/material.js',
+  '/assets/jquery.js',
+  '/assets/icons.woff2',
   '/assets/style.css',
   '/index.php',
   '/kiosk.php',
   '/scout.php',
   '/settings.php',
-  '/assets/images/teamphoto.jpg'
+  '/assets/images/teamphoto.jpg',
+  '/assets/images/offline.svg'
 ];
 
 self.addEventListener('install', function(event) {

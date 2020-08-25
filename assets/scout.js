@@ -1,6 +1,6 @@
 var teamsStandScouting = [];
 var matchesStandScouting = [];
-var teamsStand = []; //Variable for cookie
+var teamsStand = []; //Variable for localstorage item
 var matchesStand = [];
 
 Object.size = function(obj) {
@@ -12,13 +12,13 @@ Object.size = function(obj) {
 };
 
 function continueStand(){
-    if(getCookie("standScoutStart")){
+    if(localStorage.getItem("standScoutStart")){
         scoutingBoard();
         continuePit()
     }else{
         console.log("Setting up stand scouting");
     }
-    if(getCookie("currentEvent") == ""){
+    if(localStorage.getItem("currentEvent") == null){
         openEventPicker();
     }
     var ua = window.navigator.userAgent;
@@ -34,7 +34,7 @@ function fetchTeams(){
     var teamCheck = document.getElementById("teamcheck");
     buttonLabel.innerHTML = "Fetching...";
     $.ajax({
-        url: "https://www.thebluealliance.com/api/v3/event/"+getCookie("currentEvent")+"/teams/simple",
+        url: "https://www.thebluealliance.com/api/v3/event/"+localStorage.getItem("currentEvent")+"/teams/simple",
         type: "GET",
         dataType: "json",
         beforeSend: function(xhr){xhr.setRequestHeader('X-TBA-Auth-Key', 'KYyfzxvdzhHGSE6ENeT6H7sxMJsO7Gzp0BMEi7AE3nTR7pHSsmKOSKAblMInnSfw ');},
@@ -67,9 +67,9 @@ function startScouting(){
     }
     console.log("You are scouting " + teamsStandScouting.length + " teams.");
     document.getElementById("standscout").innerHTML = "<h1 class='loading'>Fetching Matches</h1>";
-    setCookie("teamsStand", JSON.stringify(teamsStandScouting), 10);
-    setCookie("standScoutStart", true, 10)
-    setCookie("savedMatches", {}, 10)
+    localStorage.setItem("teamsStand", JSON.stringify(teamsStandScouting));
+    localStorage.setItem("standScoutStart", true)
+    localStorage.setItem("savedMatches", {}, 10)
     fetchMatches()
 }
 
@@ -91,21 +91,20 @@ function pushToMatches(match, team){
 
 function fetchMatchesAjax(i, matches, _callback){
     $.ajax({
-        url: "https://www.thebluealliance.com/api/v3/team/"+ teamsStandScouting[i].key +"/event/"+ getCookie("currentEvent") +"/matches/simple",
+        url: "https://www.thebluealliance.com/api/v3/team/"+ teamsStandScouting[i].key +"/event/"+ localStorage.getItem("currentEvent") +"/matches/simple",
         type: "GET",
         dataType: "json",
         beforeSend: function(xhr){xhr.setRequestHeader('X-TBA-Auth-Key', 'KYyfzxvdzhHGSE6ENeT6H7sxMJsO7Gzp0BMEi7AE3nTR7pHSsmKOSKAblMInnSfw ');},
         success: function(contents) { 
         var j;
-        console.log(matches)
         for (j = 0; j < contents.length; j++) {
             if(contents[j].comp_level === "qm"){
             pushToMatches(contents[j].match_number, matches);
             matchesStandScouting.push(contents[j].match_number);
             matchesStandScouting = removeDuplicates(matchesStandScouting);
             }
-            setCookie("matchesStand", JSON.stringify(matchesStandScouting), 10);
-            setCookie("matchesStandDetails", JSON.stringify(matchesStandDetails), 10);
+            localStorage.setItem("matchesStand", JSON.stringify(matchesStandScouting));
+            localStorage.setItem("matchesStandDetails", JSON.stringify(matchesStandDetails));
         }    
         _callback();
         },
@@ -127,7 +126,6 @@ function fetchMatchesSync(_callback){
     }
     function waitForIt(){
         if (complete != teamsStandScouting.length) {
-            console.log(complete)
             setTimeout(function(){waitForIt()},100);
         } else {
             _callback();
@@ -137,12 +135,12 @@ function fetchMatchesSync(_callback){
 }
 
 function scoutingBoard(){
-    if(getCookie("matchesStand") === ""){
+    if(localStorage.getItem("matchesStand") === ""){
         document.getElementById("standscout").innerHTML = "<div class='text-center container'><h1>Couldn't get Matches.</h1><br><p>There appears to be no matches to scout. If this is an error, re-select the event you want to scout using <i class='material-icons align-bottom'>event</i>. Events that were cancelled or suspended don't work.</p></div>"
     }else{
-    teamsStand = JSON.parse(getCookie("teamsStand"));
-    matchesStand = JSON.parse(getCookie("matchesStand"));
-    matchesStandDetails = JSON.parse(getCookie("matchesStandDetails"));
+    teamsStand = JSON.parse(localStorage.getItem("teamsStand"));
+    matchesStand = JSON.parse(localStorage.getItem("matchesStand"));
+    matchesStandDetails = JSON.parse(localStorage.getItem("matchesStandDetails"));
     matchesStand.sort(function(a, b){return a-b});
     document.getElementById("standscout").innerHTML = "<h2 class='text-center'>Qualifier Matches</h2>"
     document.getElementById("standscout").innerHTML = document.getElementById("standscout").innerHTML + '<ul class="mdc-list mdc-list--two-line scoutlist">';
@@ -163,7 +161,7 @@ function selectTab(tab){
     document.getElementById('pitscout').classList.add("d-none");
     document.getElementById(tab).classList.remove("d-none");
     tabBar.activateTab(document.getElementById(tab + "tab"), 1);
-    if(tab='pitscout' && getCookie('pitScoutStart')!== ""){
+    if(tab='pitscout' && localStorage.getItem('pitScoutStart')!== ""){
         continuePit()
     }
 }
@@ -174,12 +172,14 @@ const standFields = [
     {
         "type":"number",
         "title":"High Goals",
-        "id":"high"
+        "id":"high",
+        "weight": 2
     },
     {
         "type":"number",
         "title":"Low Goals",
-        "id":"low"
+        "id":"low",
+        "weight": 1
     },
     {
         "type":"checkbox",
@@ -289,13 +289,21 @@ function saveStandAnswers(match){
         dropdownValues[dropdowns[i].root.id] = dropdowns[i].value
     }
     for(var i = 0; i < ratings.length; i++){
+        if(isNaN(ratings[i].value)){
+            ratingValues[ratings[i].root.id] = "4"
+        }else{
         ratingValues[ratings[i].root.id] = ratings[i].value
+        }
     }
     for(var i = 0; i < standFields.length; i++){
         if(standFields[i].type != 'dropdown' && standFields[i].type != 'rating'){
             for(var rep = 0; rep < matchesStandDetails[match].teams.length; rep++){
                 if(standFields[i].type != 'checkbox'){
-                    otherValues[standFields[i].id+matchesStandDetails[match].teams[rep]] = document.getElementById(standFields[i].id+matchesStandDetails[match].teams[rep]).value
+                    if(isNaN(document.getElementById(standFields[i].id+matchesStandDetails[match].teams[rep]).value)){
+                        otherValues[standFields[i].id+matchesStandDetails[match].teams[rep]] = 0
+                    }else{
+                        otherValues[standFields[i].id+matchesStandDetails[match].teams[rep]] = document.getElementById(standFields[i].id+matchesStandDetails[match].teams[rep]).value
+                    }
                 }else{
                     otherValues[standFields[i].id+matchesStandDetails[match].teams[rep]] = document.getElementById(standFields[i].id+matchesStandDetails[match].teams[rep]).checked
                 }
@@ -308,7 +316,6 @@ function saveStandAnswers(match){
         var ids = Object.keys(allFields);
         var team = ids[rep].split(/([0-9]+)/)[1];
         var value = localStorage.getItem(team+'stand')
-            console.log(value)
             var newValue;
             if(!value){
                 newValue = new Object;
@@ -326,6 +333,7 @@ function saveStandAnswers(match){
     setTimeout(function(){formOpen(false)},2500);
     document.getElementById('stand'+match+'item').onclick = '';
     completedItems.push('match'+match);
+    localStorage.setItem('completedItems', JSON.stringify(completedItems))
 }
 
 //Pit Scouting
@@ -342,24 +350,22 @@ if(!checkedItems){ //if null
 
 
 function checkCheck(team){
-    console.log('check checking')
     if(completedItems.indexOf('team'+team) !== -1){
         $('#pit'+team+'checkbox').ready(function () {       //Waits until checkbox is ready before checking
             document.getElementById('pit'+team+'checkbox').checked = true;
             document.getElementById('pit'+team+'checkbox').disabled = true;
-            document.getElementById('pit'+team+'item').onclick = '';s
+            document.getElementById('pit'+team+'item').onclick = '';
           });          
         }else if(checkedItems.indexOf('team'+team)!= -1){  //If team is in checkedItems
             $('#pit'+team+'checkbox').ready(function () {       //Waits until checkbox is ready before checking
                 $('#pit'+team+'checkbox').prop('checked',true);
               });          
-            console.log('check checked')
         }
 }
 
 var pitCheckboxes;
 function continuePit(){
-    if(getCookie("standScoutStart")){
+    if(localStorage.getItem("standScoutStart")){
     
     console.log('Pit Scouting Continued')
     document.getElementById("pitscout").innerHTML = "<h2 class='text-center'>Pit Scouting</h2>"
@@ -376,7 +382,6 @@ function continuePit(){
     };
 for (var i = 0 ; i < pitCheckboxes.length; i++) {
     pitCheckboxes[i].addEventListener('change' , function(type) {
-        console.log(type.srcElement)
         if(type.srcElement.checked) {
             if(checkedItems.indexOf(type.srcElement.name) == -1){
                 checkedItems.push(type.srcElement.name);
@@ -474,7 +479,6 @@ function savePitAnswers(team){
     for(var rep = 0; rep < Object.size(allFields); rep++){
         var ids = Object.keys(allFields);
         var value = localStorage.getItem(team+'pit')
-            console.log(value)
             var newValue;
             if(!value){
                 newValue = new Object;

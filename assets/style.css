@@ -56,7 +56,7 @@ textarea:focus, input:focus{
     margin-top: 30px;
 }
 .side-number{
-    color: #7DC834;
+    color: var(--mdc-theme-primary,#7DC834);
     font-weight: bold;
 
 }
@@ -65,7 +65,7 @@ textarea:focus, input:focus{
 }
 .side-icon{
     font-family: "Material Icons";
-    color: #7DC834;
+    color: var(--mdc-theme-primary,#7DC834);
 }
 label {
     -webkit-touch-callout: none; /* iOS Safari */
@@ -168,13 +168,13 @@ div.fade{
     position: fixed;
     top: 0px;
     left: 0px;
-    background-color: white;
+    background-color: var(--mdc-theme-surface, white);
     animation-name: form-zoom;
     animation-duration: 0.2s;
 }
 @keyframes form-zoom {
-    from {transform: scale(0); width: 0; height: 0; top: 50vh; left: 50vw; border-radius: 50%; background-color: lightgray; display: none;}
-    to {transform: initial; width: 100vw; height: 100vh; top: 0; left: 0; border-radius: 0; background-color: white; display: block;}
+    from {transform: scale(0); width: 0; height: 0; top: 50vh; left: 50vw; border-radius: 50%; background-color: gray; display: none;}
+    to {transform: initial; width: 100vw; height: 100vh; top: 0; left: 0; border-radius: 0; background-color: var(--mdc-theme-surface, white); display: block;}
 }
 /* fallback */
 @font-face {
@@ -211,4 +211,69 @@ div.fade{
         -ms-user-select: none; /* Internet Explorer/Edge */
             user-select: none; /* Non-prefixed version, currently
                                   supported by Chrome, Edge, Opera and Firefox */
+}
+.dark-mode>body>.main-content{
+    background-color:black;
+    color:white;
+}
+html.dark-mode{
+    background-color:black;
+}
+.dark-mode>body>.drawer-frame-root>.drawer-main-content>.mdc-top-app-bar{
+    background-color:#222222;
+    color:white;
+}
+.dark-mode>body>.drawer-frame-root>.mdc-drawer{
+    background-color:#222222;
+}
+.dark-mode>body>.drawer-frame-root>.mdc-drawer>.mdc-drawer__content>.mdc-list>.mdc-list-item:not(.mdc-list-item--activated){
+    color:white !important;
+}
+.dark-mode>body>.drawer-frame-root>.mdc-drawer>.mdc-drawer__content>.mdc-list>.mdc-list-item:not(.mdc-list-item--activated)>i{
+    color:white !important;
+}
+.dark-mode>main>{
+    color:white !important;
+}
+.dark-mode{
+    --mdc-theme-text-secondary-on-background :white;
+    --mdc-theme-text-icon-on-background: rgba(255,255,255,0.50);
+    --mdc-theme-background: black;
+    --mdc-theme-surface: #212121;
+    --mdc-theme-text-primary-on-background: white;
+    --dark-theme-text-input: var(--mdc-theme-surface, #f5f5f5);
+}
+.dark-mode>body>main>.mdc-tab-bar>div>div>div>.mdc-tab:not(.mdc-tab--active)>.mdc-tab__content>span{
+    color: white;
+}
+.mdc-data-table__header-cell, .mdc-data-table__cell, .mdc-data-table__header-cell--sorted .mdc-data-table__sort-icon-button{
+    color: var(--mdc-theme-text-primary-on-background, black)
+}
+.mdc-dialog__content, .mdc-dialog__title, .mdc-text-field:not(.mdc-text-field--focused) .mdc-floating-label, .mdc-select:not(.mdc-select--focused) .mdc-floating-label{
+    color: var(--mdc-theme-text-primary-on-background, black) !important
+}
+.mdc-radio .mdc-radio__native-control:enabled:not(:checked) + .mdc-radio__background .mdc-radio__outer-circle, .mdc-checkbox__native-control:enabled:not(:checked):not(:indeterminate):not([data-indeterminate="true"]) ~ .mdc-checkbox__background, .mdc-text-field--outlined:not(.mdc-text-field--focused) .mdc-notched-outline__leading, .mdc-text-field--outlined:not(.mdc-text-field--focused) .mdc-notched-outline__notch, .mdc-text-field--outlined:not(.mdc-text-field--focused) .mdc-notched-outline__trailing, .mdc-select--outlined:not(.mdc-select--focused) .mdc-notched-outline__leading, .mdc-select--outlined:not(.mdc-select--focused) .mdc-notched-outline__notch, .mdc-select--outlined:not(.mdc-select--focused) .mdc-notched-outline__trailing{
+    border-color: var(--mdc-theme-text-icon-on-background, black) !important;
+}
+.mdc-text-field__input, .mdc-text-field:not(.mdc-text-field--disabled) .mdc-text-field__icon--trailing, .mdc-list-item__text:not(.drawer_text), .mdc-select__selected-text{
+    color: var(--mdc-theme-text-primary-on-background, black) !important
+}
+noscript {
+	background-color: #ff0000 !important;
+	color: white;
+	border-radius: 15px;
+	display: inherit;
+	padding: 20px;
+    margin: 50px;
+}
+.chartjs-wrapper{
+    width: 100% !important;
+    height: 100% !important;
+    display:block;
+}
+.mdc-text-field--filled:not(.mdc-text-field--disabled){
+    background-color: var(--dark-theme-text-input, #f5f5f5) !important;
+}
+.mdc-text-field--disabled.mdc-text-field--filled{
+    background-color: var(--mdc-theme-surface, #fafafa) 
 }
