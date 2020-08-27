@@ -12,11 +12,13 @@ var urlsToCache = [
   '/scout.php',
   '/settings.php',
   '/assets/images/teamphoto.jpg',
-  '/assets/images/offline.svg'
+  '/assets/images/offline.svg',
+  '/assets/pouchdb.js',
+  '/assets/charts.js',
+  '/assets/pouchdb-worker.js'
 ];
 
 self.addEventListener('install', function(event) {
-  // Perform install steps
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(function(cache) {

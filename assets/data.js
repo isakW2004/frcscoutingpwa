@@ -224,11 +224,12 @@ function sortTable(n, dir) {
 var db;
 
 function logIn(uname, passwd){
+  var location = window.location;
   workerPouch.isSupportedBrowser().then(function (supported) {
     if (supported) {
-     db = new PouchDB(window.location.origin+ ':5984/frc'+ localStorage.getItem('currentEvent'), {'auth': {'username':uname, 'password':passwd},},{adapter: 'worker'});
+     db = new PouchDB(location.protocol+'//data.'+location.host+'/frc'+ localStorage.getItem('currentEvent')+ localStorage.getItem('currentEvent'), {'auth': {'username':uname, 'password':passwd},},{adapter: 'worker'});
     } else { // fall back to a normal PouchDB
-      db = new PouchDB(window.location.origin+ ':5984/frc'+ localStorage.getItem('currentEvent'), {'auth': {'username':uname, 'password':passwd}});
+      db = new PouchDB(location.protocol+'//data.'+location.host+'/frc'+ localStorage.getItem('currentEvent')+ localStorage.getItem('currentEvent'), {'auth': {'username':uname, 'password':passwd}});
     }
     login[0].disabled = true;
     login[1].disabled = true;
