@@ -53,7 +53,7 @@ textarea:focus, input:focus{
     outline: none;
 }
 .aboutus{
-  background-image: url("assets/images/teamphoto.jpg");
+  background-image: url("https://isakw2004.github.io/frcscoutingpwa/assets/images/teamphoto.jpg");
   height: 50vh;
   background-attachment: fixed;
   background-position: center;
@@ -198,7 +198,7 @@ div.fade{
     font-family: 'Material Icons';
     font-style: normal;
     font-weight: 400;
-    src: url(assets/icons.woff2) format('woff2');
+    src: url(https://isakw2004.github.io/frcscoutingpwa/assets/icons.woff2) format('woff2');
   }
   
   .material-icons {
