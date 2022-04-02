@@ -21,12 +21,6 @@ function continueStand(){
     if(localStorage.getItem("currentEvent") == null){
         openEventPicker();
     }
-    var ua = window.navigator.userAgent;
-    var msie = ua.indexOf('MSIE ');
-    var trident = ua.indexOf('Trident/');
-    if (msie > 0 || trident > 0) {
-            window.alert("Unfortunately, this app does not support Internet Explorer. For a full experience, switch to a modern browser.")
-        }
 }
 
 function fetchTeams(){
@@ -51,7 +45,13 @@ function fetchTeams(){
         
         },
         error: function(error) {
-            buttonLabel.innerHTML = "Error. Check Internet ";
+            if(localStorage.getItem("currentEvent")== null){
+                snackbar.labelText = "You need to actually choose an event before you scout."
+            }else{
+                snackbar.labelText="There was an error fetching your teams. Check your internet connection and try again."
+            }
+            snackbar.open()
+            buttonLabel.innerHTML = "Retry"
           }
      });
 }
@@ -69,7 +69,6 @@ function startScouting(){
     document.getElementById("standscout").innerHTML = "<h1 class='loading'>Fetching Matches</h1>";
     localStorage.setItem("teamsStand", JSON.stringify(teamsStandScouting));
     localStorage.setItem("standScoutStart", true)
-    localStorage.setItem("savedMatches", {}, 10)
     fetchMatches()
 }
 
@@ -113,6 +112,7 @@ function fetchMatchesAjax(i, matches, _callback){
 
 function fetchMatches(){
     fetchMatchesSync(function() {
+        snackbar.labelText = "Match Schedule Downloaded."
         snackbar.open()
         scoutingBoard();
     });    
@@ -338,7 +338,7 @@ function saveStandAnswers(match){
 
 //Pit Scouting
 
-const allTeams = JSON.parse(localStorage.getItem('allTeams'));
+var allTeams = JSON.parse(localStorage.getItem('allTeams'));
 var completedItems = JSON.parse(localStorage.getItem('completedItems'));
 var checkedItems = JSON.parse(localStorage.getItem('checkedItems'));
 if(!completedItems){ //if null
@@ -370,6 +370,9 @@ function continuePit(){
     console.log('Pit Scouting Continued')
     document.getElementById("pitscout").innerHTML = "<h2 class='text-center'>Pit Scouting</h2>"
     document.getElementById("pitscout").innerHTML = document.getElementById("pitscout").innerHTML + '<ul class="mdc-list mdc-list--two-line scoutlist">';
+    if(allTeams == null){
+        allTeams = JSON.parse(localStorage.getItem('allTeams'));
+    }
     for(var i = 0; i < allTeams.length; i++){
         document.getElementById("pitscout").innerHTML= document.getElementById("pitscout").innerHTML + '<li class="mdc-list-item pitScoutItem" role="checkbox"><span class="mdc-list-item__graphic"><div class="mdc-checkbox"><input name="team'+allTeams[i].team_number+'"type="checkbox"id="pit'+allTeams[i].team_number+'checkbox"class="mdc-checkbox__native-control"id="demo-list-checkbox-item-1"  /><div class="mdc-checkbox__background"><svg class="mdc-checkbox__checkmark"viewBox="0 0 24 24"><path class="mdc-checkbox__checkmark-path"fill="none"d="M1.73,12.91 8.1,19.28 22.79,4.59"/></svg><div class="mdc-checkbox__mixedmark"></div></div></div></span><label style="width: 100%" id="pit'+allTeams[i].team_number+ 'item"onclick="showPitForm('+allTeams[i].team_number+')"><span class="mdc-list-item__primary-text">'+allTeams[i].team_number +' ' + allTeams[i].nickname+'</span><span class="mdc-list-item__secondary-text">'+allTeams[i].city + ', '+ allTeams[i].state_prov+'</span></label></li>'
         checkCheck(allTeams[i].team_number)

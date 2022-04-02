@@ -47,13 +47,19 @@
   </g>
 </svg>
 <h2 >Log In</h2>
-<label class="mdc-text-field mdc-text-field--filled">
+<label class="mdc-text-field mdc-text-field--filled mdc-text-field--with-trailing-icon" id="urlSetter" hidden>
+          <span class="mdc-text-field__ripple"></span>
+          <input class="mdc-text-field__input" value="http://">
+          <span class="mdc-floating-label" id="password-label">Server Address</span>
+          <span class="mdc-line-ripple"></span>
+        </label><br>
+<label class="mdc-text-field mdc-text-field--filled log-in-field">
           <span class="mdc-text-field__ripple"></span>
           <input class="mdc-text-field__input" type="text" id='username' aria-labelledby="my-label-id">
           <span class="mdc-floating-label" id="my-label-id">Name</span>
           <span class="mdc-line-ripple"></span>
         </label><br>
-        <label class="mdc-text-field mdc-text-field--filled mdc-text-field--with-trailing-icon">
+        <label class="mdc-text-field mdc-text-field--filled mdc-text-field--with-trailing-icon log-in-field">
           <span class="mdc-text-field__ripple"></span>
           <input class="mdc-text-field__input" type="password" id='password' aria-labelledby="password-label" aria-controls="password-helper" aria-describedby="password-helper">
           <i class="material-icons mdc-text-field__icon mdc-text-field__icon--trailing" tabindex="0" role="button" onclick="logIn(document.getElementById('username').value, document.getElementById('password').value)">arrow_forward</i>
@@ -112,7 +118,7 @@
   >
   <span class="mdc-button__label">Export as JSON</span>
 </a>
-<button class="mdc-button" onclick="window.location = window.location.origin+ ':5984/_utils'">
+<button class="mdc-button" onclick="window.location = localStorage.getItem('couchUrl')+ ':5984/_utils'">
   <div class="mdc-button__ripple"></div>
   <i class="material-icons mdc-button__icon" aria-hidden="true"
     >launch</i
@@ -193,8 +199,9 @@ body{
 </div>
 
 </div>
-<script>
-    const login = [].map.call(document.querySelectorAll('.mdc-text-field'), function(el) {
+<div class="mdc-snackbar" id="snackbar"><div class=mdc-snackbar__surface><div class=mdc-snackbar__label aria-live=polite role=status>There was an error</div></div></div>
+<script> 
+    const login = [].map.call(document.querySelectorAll('.log-in-field'), function(el) {
   return new mdc.textField.MDCTextField(el);
 });
   const helpWindow = new mdc.dialog.MDCDialog(document.getElementById('help'));
@@ -205,6 +212,7 @@ body{
     logIn(document.getElementById('username').value, document.getElementById('password').value)
   }
 }); 
+const snackbar = new mdc.snackbar.MDCSnackbar(document.getElementById('snackbar'));
 </script>
 <br><br><br>
 <style>

@@ -16,6 +16,10 @@ if(!navigator.onLine){
   document.getElementById('offline').hidden=false;
   document.getElementById('login').hidden = true;
 }
+if(localStorage.getItem("couchUrl") == null){
+  document.getElementById("urlSetter").hidden=false
+  urlSetter = new mdc.textField.MDCTextField(document.getElementById("urlSetter"))
+}
 })
 if(allTeams == null){
   if(localStorage.getItem('currentEvent') != null){
@@ -28,8 +32,8 @@ if(allTeams == null){
     localStorage.setItem('allTeams', JSON.stringify(contents))
     allTeams=contents
     },
-    error: function(error) {
-        window.alert("Could not reach The Blue Alliance.")
+    error: function() {
+        window.alert("Could not reach The Blue Alliance. Check your internet connection and try again.")
       }
  });
 }else{
@@ -40,9 +44,9 @@ var data;
 var skippedTeams = [];
 var dropdowni;
 var dropdownteam;
+var urlSetter;
 
-
-Math.avg = function(array) {  //adds the missing javascript average calculation
+Math.avg = function(array) {
   var sum = 0;
   for (i=0;i<array.length;i++) {
     sum += parseInt(array[i]);
@@ -224,12 +228,20 @@ function sortTable(n, dir) {
 var db;
 
 function logIn(uname, passwd){
-  var location = window.location;
+  if(localStorage.getItem("currentEvent")== null){
+    window.alert("Pick an event to view data")
+    openEventPicker()
+    return
+  }
+  if(localStorage.getItem("couchUrl") == null){
+    localStorage.setItem("couchUrl", urlSetter.value)
+  }
+  try{
   workerPouch.isSupportedBrowser().then(function (supported) {
     if (supported) {
-     db = new PouchDB(location.protocol+'//data.'+location.host+'/frc'+ localStorage.getItem('currentEvent'), {'auth': {'username':uname, 'password':passwd},},{adapter: 'worker'});
+     db = new PouchDB(localStorage.getItem("couchUrl")+':5984/frc'+ localStorage.getItem('currentEvent'), {'auth': {'username':uname, 'password':passwd},},{adapter: 'worker'});
     } else { // fall back to a normal PouchDB
-      db = new PouchDB(location.protocol+'//data.'+location.host+'/frc'+ localStorage.getItem('currentEvent'), {'auth': {'username':uname, 'password':passwd}});
+      db = new PouchDB(localStorage.getItem("couchUrl")+':5984/frc'+ localStorage.getItem('currentEvent'), {'auth': {'username':uname, 'password':passwd}});
     }
     login[0].disabled = true;
     login[1].disabled = true;
@@ -243,13 +255,15 @@ function logIn(uname, passwd){
       login[1].valid = false;
     }else{
       console.log(err)
-      document.body.innerHTML += '<div class="mdc-snackbar" id="upload-error"><div class=mdc-snackbar__surface><div class=mdc-snackbar__label aria-live=polite role=status>There was an error</div><div class=mdc-snackbar__actions><button class="mdc-button mdc-snackbar__action" type=button onclick="window.alert(error)"><div class=mdc-button__ripple></div><span class=mdc-button__label>More Info</span></button></div></div></div>'
-      const snackbar = new mdc.snackbar.MDCSnackbar(document.getElementById('upload-error'));
+      snackbar.labelText="Sorry, there was an error. We can't reach your database."
       snackbar.open()
-      error = err;
+      error = err;f
     }
   });
   }).catch(console.log.bind(console)); 
+  }catch{
+    
+  }
 }
 
 function getDbByID(array, id){

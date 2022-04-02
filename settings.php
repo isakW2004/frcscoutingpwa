@@ -90,6 +90,12 @@
       aria-describedby="my-dialog-content">
       <div class="mdc-dialog__content" id="login-dialog-content">
         Log in to upload scouting data<br><br>
+        <label class="mdc-text-field mdc-text-field--filled" id="urlSetter" hidden>
+          <span class="mdc-text-field__ripple"></span>
+          <input class="mdc-text-field__input" value="http://">
+          <span class="mdc-floating-label" id="password-label">Server Address</span>
+          <span class="mdc-line-ripple"></span>
+        </label><br>
         <label class="mdc-text-field mdc-text-field--filled">
           <span class="mdc-text-field__ripple"></span>
           <input class="mdc-text-field__input" type="text" id='username' aria-labelledby="my-label-id">
@@ -132,7 +138,7 @@
   const alert = new mdc.dialog.MDCDialog(document.querySelector('.settings-alert'));
   const upload = new mdc.dialog.MDCDialog(document.querySelector('.upload-data'));
   const settings = new mdc.list.MDCList(document.querySelector('.mdc-list'));
-  const success = new mdc.snackbar.MDCSnackbar(document.getElementById('success'));
+  const snackbar = new mdc.snackbar.MDCSnackbar(document.getElementById('success'));
   const listItemRipples = [].map.call(document.querySelectorAll('.mdc-list-item'), function(el) {
   return new mdc.ripple.MDCRipple(el);
 });
@@ -169,35 +175,41 @@ var data = new Object;
 
 function logIn(uname, passwd, btn){
   btn.onclick = '';
-  var location = window.location;
-  workerPouch.isSupportedBrowser().then(function (supported) {
-  if (supported) {
-     db = new PouchDB(location.protocol+'//data.'+location.host+'/frc'+ localStorage.getItem('currentEvent'), {'auth': {'username':uname, 'password':passwd},},{adapter: 'worker'});
-    } else { // fall back to a normal PouchDB
-      db = new PouchDB(location.protocol+'//data.'+location.host+'/frc'+ localStorage.getItem('currentEvent'), {'auth': {'username':uname, 'password':passwd}});
-    }
-    login[0].disabled = true;
-  login[1].disabled = true;
-  db.info().then(function (info) {
-  console.log(info);
-  document.getElementById('button-icon').outerHTML = '<div class="mdc-circular-progress mdc-circular-progress--indeterminate mdc-button__icon" style="width:24px;height:24px; --mdc-theme-primary: white" role="progressbar" aria-label="Example Progress Bar" aria-valuemin="0" aria-valuemax="1"><div class="mdc-circular-progress__determinate-container"> <svg class="mdc-circular-progress__determinate-circle-graphic" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"> <circle class="mdc-circular-progress__determinate-circle" cx="12" cy="12" r="8.75" stroke-dasharray="54.978" stroke-dashoffset="54.978" stroke-width="2.5"/> </svg></div><div class="mdc-circular-progress__indeterminate-container"><div class="mdc-circular-progress__spinner-layer"><div class="mdc-circular-progress__circle-clipper mdc-circular-progress__circle-left"> <svg class="mdc-circular-progress__indeterminate-circle-graphic" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"> <circle cx="12" cy="12" r="8.75" stroke-dasharray="54.978" stroke-dashoffset="27.489" stroke-width="2.5"/> </svg></div><div class="mdc-circular-progress__gap-patch"> <svg class="mdc-circular-progress__indeterminate-circle-graphic" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"> <circle cx="12" cy="12" r="8.75" stroke-dasharray="54.978" stroke-dashoffset="27.489" stroke-width="2"/> </svg></div><div class="mdc-circular-progress__circle-clipper mdc-circular-progress__circle-right"> <svg class="mdc-circular-progress__indeterminate-circle-graphic" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"> <circle cx="12" cy="12" r="8.75" stroke-dasharray="54.978" stroke-dashoffset="27.489" stroke-width="2.5"/> </svg></div></div></div></div>'
-  progress= new mdc.circularProgress.MDCCircularProgress(document.querySelector('.mdc-circular-progress'));
-  db.allDocs({include_docs: true}).then(function(result){data=result; uploadData()})
-}).catch(function (err) {
-  login[0].disabled = false;
-    login[1].disabled = false;
-  if(err.error == 'unauthorized'){
-    login[0].valid = false;
-    login[1].valid = false;
-  }else{
-    console.log(err)
-    document.body.innerHTML += '<div class="mdc-snackbar" id="upload-error"><div class=mdc-snackbar__surface><div class=mdc-snackbar__label aria-live=polite role=status>There was an error</div><div class=mdc-snackbar__actions><button class="mdc-button mdc-snackbar__action" type=button onclick="window.alert(error)"><div class=mdc-button__ripple></div><span class=mdc-button__label>More Info</span></button></div></div></div>'
-    const snackbar = new mdc.snackbar.MDCSnackbar(document.getElementById('upload-error'));
-    snackbar.open()
-    error = err;
+  if(localStorage.getItem("couchUrl") == null){
+    localStorage.setItem("couchUrl", urlSetter.value)
   }
-});
+  try{
+    workerPouch.isSupportedBrowser().then(function (supported) {
+      if (supported) {
+     db = new PouchDB(localStorage.getItem("couchUrl")+':5984/frc'+ localStorage.getItem('currentEvent'), {'auth': {'username':uname, 'password':passwd},},{adapter: 'worker'});
+    } else { // fall back to a normal PouchDB
+      db = new PouchDB(localStorage.getItem("couchUrl")+':5984/frc'+ localStorage.getItem('currentEvent'), {'auth': {'username':uname, 'password':passwd}});
+    }
+      login[0].disabled = true;
+    login[1].disabled = true;
+    db.info().then(function (info) {
+    console.log(info);
+    document.getElementById('button-icon').outerHTML = '<div class="mdc-circular-progress mdc-circular-progress--indeterminate mdc-button__icon" style="width:24px;height:24px; --mdc-theme-primary: white" role="progressbar" aria-label="Example Progress Bar" aria-valuemin="0" aria-valuemax="1"><div class="mdc-circular-progress__determinate-container"> <svg class="mdc-circular-progress__determinate-circle-graphic" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"> <circle class="mdc-circular-progress__determinate-circle" cx="12" cy="12" r="8.75" stroke-dasharray="54.978" stroke-dashoffset="54.978" stroke-width="2.5"/> </svg></div><div class="mdc-circular-progress__indeterminate-container"><div class="mdc-circular-progress__spinner-layer"><div class="mdc-circular-progress__circle-clipper mdc-circular-progress__circle-left"> <svg class="mdc-circular-progress__indeterminate-circle-graphic" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"> <circle cx="12" cy="12" r="8.75" stroke-dasharray="54.978" stroke-dashoffset="27.489" stroke-width="2.5"/> </svg></div><div class="mdc-circular-progress__gap-patch"> <svg class="mdc-circular-progress__indeterminate-circle-graphic" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"> <circle cx="12" cy="12" r="8.75" stroke-dasharray="54.978" stroke-dashoffset="27.489" stroke-width="2"/> </svg></div><div class="mdc-circular-progress__circle-clipper mdc-circular-progress__circle-right"> <svg class="mdc-circular-progress__indeterminate-circle-graphic" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"> <circle cx="12" cy="12" r="8.75" stroke-dasharray="54.978" stroke-dashoffset="27.489" stroke-width="2.5"/> </svg></div></div></div></div>'
+    progress= new mdc.circularProgress.MDCCircularProgress(document.querySelector('.mdc-circular-progress'));
+    db.allDocs({include_docs: true}).then(function(result){data=result; uploadData()})
+    }).catch(function (err) {
+    login[0].disabled = false;
+      login[1].disabled = false;
+    if(err.error == 'unauthorized'){
+      login[0].valid = false;
+      login[1].valid = false;
+    }else{
+      console.log(err)
+      snackbar.labelText = "Sorry, there was an error. Your data was not uploaded."
+      snackbar.open()
+      error = err;
+      btn.onclick=  function(){logIn(document.getElementById('username').value, document.getElementById('password').value, this)}
+    }
   }).catch(console.log.bind(console)); 
+});
+}catch{
+
+}
 }
 var bulkArray;
 var teamsPitScouted = [];
@@ -238,5 +250,9 @@ function getDbByID(array, id){
     }
   }
   return -1;  //if not, return -1, meaning it doesn't exist
+}
+if(localStorage.getItem("couchUrl") == null){
+  document.getElementById("urlSetter").hidden=false
+  urlSetter = new mdc.textField.MDCTextField(document.getElementById("urlSetter"))
 }
 </script>

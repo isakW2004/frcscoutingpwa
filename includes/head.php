@@ -21,11 +21,7 @@
   <meta name="color-scheme" content="dark light">
 </head>
 <script>
-//service worker for Progressive Web App mode
-window.addEventListener('beforeinstallprompt', (event) => {
-  console.log('👍', 'beforeinstallprompt', event);
-  window.deferredPrompt = event;
-});
+if(localStorage.getItem('debugging')== null){
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
     navigator.serviceWorker.register('/sw.js').then(function(registration) {
@@ -36,6 +32,7 @@ if ('serviceWorker' in navigator) {
       console.log('ServiceWorker registration failed: ', err);
     });
   });
+}
 }
 </script>
     <body>

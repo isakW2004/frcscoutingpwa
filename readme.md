@@ -1,4 +1,4 @@
-# FRC Scouting PWA
+# FRC Scouting PWA - UNDER CONSTRUCTION
 A lightweight, offline scouting app for FRC teams.
 
 ### Set-Up

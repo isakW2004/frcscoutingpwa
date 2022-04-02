@@ -15,7 +15,7 @@
         </button>
         <button class="mdc-tab" role="tab" aria-selected="false" id="pitscouttab" tabindex="0" onclick="selectTab('pitscout')">
           <span class="mdc-tab__content">
-            <span class="mdc-tab__icon material-icons" aria-hidden="true">mood</span>
+            <span class="mdc-tab__icon material-icons" aria-hidden="true">connect_without_contact</span>
             <span class="mdc-tab__text-label">Pit</span>
           </span>
           <span class="mdc-tab-indicator">
@@ -66,7 +66,6 @@
     <div class="mdc-snackbar__label"
          role="status"
          aria-live="polite">
-      All set up. Internet is no longer needed.
     </div>
   </div>
 </div>
@@ -96,7 +95,7 @@
 
 <script>
     const helpWindow = new mdc.dialog.MDCDialog(document.getElementById('help'));
-    window.onload = continueStand();
+    continueStand()
     const tabBar = new mdc.tabBar.MDCTabBar(document.querySelector('.mdc-tab-bar'));
     const tabIndicator = new mdc.tabIndicator.MDCTabIndicator(document.querySelector('.mdc-tab-indicator'));
     const snackbar = new mdc.snackbar.MDCSnackbar(document.querySelector('.mdc-snackbar'));
