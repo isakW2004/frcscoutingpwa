@@ -5,7 +5,7 @@ function openEventPicker(){
   document.getElementById('eventButton').disabled=true;
   if(document.getElementById("eventlist").innerHTML == "\n        "){
     $.ajax({
-      url: "https://www.thebluealliance.com/api/v3/team/frc2530/events/"+ /*today.getFullYear()*/2019  +"/simple",
+      url: "https://www.thebluealliance.com/api/v3/team/frc2530/events/"+today.getFullYear()+"/simple",
       type: "GET",
       dataType: "json",
       beforeSend: function(xhr){xhr.setRequestHeader('X-TBA-Auth-Key', 'KYyfzxvdzhHGSE6ENeT6H7sxMJsO7Gzp0BMEi7AE3nTR7pHSsmKOSKAblMInnSfw ');},
