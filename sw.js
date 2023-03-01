@@ -1,21 +1,35 @@
 var CACHE_NAME = '2530events';
 var urlsToCache = [
-  '/',
-  '/assets/material.css',
-  '/assets/bootstrapcustom.min.css',
-  '/assets/material.js',
-  '/assets/jquery.js',
-  '/assets/icons.woff2',
-  '/assets/style.css',
-  '/index.php',
-  '/kiosk.php',
-  '/scout.php',
-  '/settings.php',
-  '/assets/images/teamphoto.jpg',
-  '/assets/images/offline.svg',
-  '/assets/pouchdb.js',
-  '/assets/charts.js',
-  '/assets/pouchdb-worker.js'
+  'assets/material.css',
+  'assets/bootstrapcustom.min.css',
+  'assets/material.js',
+  'assets/jquery.js',
+  'assets/icons.woff2',
+  'assets/style.css',
+  'index.html',
+  'kiosk.html',
+  'scout.html',
+  'settings.html',
+  'assets/images/teamphoto.jpg',
+  'assets/charts.js',
+  'assets/genQRCode.js',
+  'assets/qrreader/alignpat.js',
+  'assets/qrreader/bitmat.js',
+  'assets/qrreader/bmparser.js',
+  'assets/qrreader/datablock.js',
+  'assets/qrreader/databr.js',
+  'assets/qrreader/datamask.js',
+  'assets/qrreader/decoder.js',
+  'assets/qrreader/detector.js',
+  'assets/qrreader/errorlevel.js',
+  'assets/qrreader/findpat.js',
+  'assets/qrreader/formatinf.js',
+  'assets/qrreader/gf256.js',
+  'assets/qrreader/gf256poly.js',
+  'assets/qrreader/grid.js',
+  'assets/qrreader/qrcode.js',
+  'assets/qrreader/rsdecoder.js',
+  'assets/qrreader/version.js',
 ];
 
 self.addEventListener('install', function(event) {
@@ -23,7 +37,11 @@ self.addEventListener('install', function(event) {
     caches.open(CACHE_NAME)
       .then(function(cache) {
         console.log('Opened cache');
-        return cache.addAll(urlsToCache);
+        try{
+          return cache.addAll(urlsToCache);
+        }catch(err){
+          console.log(err);
+        }
       })
   );
 });

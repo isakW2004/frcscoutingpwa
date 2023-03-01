@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="2530 Events">
+  <meta name="theme-color" content="#7DC834" />
+  <link rel="apple-touch-icon" href="assets/images/icon-512-mask.png">
+  <title>Welcome - 2530 Scouting</title>
+  <link rel="stylesheet" href="assets/bootstrapcustom.min.css">
+  <link href="assets/material.css" rel="stylesheet">
+  <script type="text/javascript" src="assets/material.js"></script>
+  <link rel="stylesheet" href="assets/style.css">
+  <script type="text/javascript" src="assets/sitewide.js"></script>
+  <meta name="description" content="Scouting and more for FRC Team 2530">
+  <script type="text/javascript" src="assets/jquery.js"></script>
+  <meta name="color-scheme" content="dark light">
+  <!--QRCODEJS-->
+  <script type="text/javascript" src="assets/qrreader/grid.js"></script>
+  <script type="text/javascript" src="assets/qrreader/version.js"></script>
+  <script type="text/javascript" src="assets/qrreader/detector.js"></script>
+  <script type="text/javascript" src="assets/qrreader/formatinf.js"></script>
+  <script type="text/javascript" src="assets/qrreader/errorlevel.js"></script>
+  <script type="text/javascript" src="assets/qrreader/bitmat.js"></script>
+  <script type="text/javascript" src="assets/qrreader/datablock.js"></script>
+  <script type="text/javascript" src="assets/qrreader/bmparser.js"></script>
+  <script type="text/javascript" src="assets/qrreader/datamask.js"></script>
+  <script type="text/javascript" src="assets/qrreader/rsdecoder.js"></script>
+  <script type="text/javascript" src="assets/qrreader/gf256poly.js"></script>
+  <script type="text/javascript" src="assets/qrreader/gf256.js"></script>
+  <script type="text/javascript" src="assets/qrreader/decoder.js"></script>
+  <script type="text/javascript" src="assets/qrreader/qrcode.js"></script>
+  <script type="text/javascript" src="assets/qrreader/findpat.js"></script>
+  <script type="text/javascript" src="assets/qrreader/alignpat.js"></script>
+  <script type="text/javascript" src="assets/qrreader/databr.js"></script>
+</head>
+<script>
+  if (localStorage.getItem('debugging') == null) {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').then(function (registration) {
+          // Registration was successful
+          console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        }, function (err) {
+          // registration failed :(
+          console.log('ServiceWorker registration failed: ', err);
+        });
+      });
+    }
+  }
+</script>
+
+<body>
+  <div class="drawer-frame-root">
+    <aside class="mdc-drawer mdc-drawer--modal" id="drawer">
+      <div class="mdc-drawer__content">
+        <nav class="mdc-list" data-mdc-auto-init="MDCList">
+          <a class="mdc-list-item " href="index.html" aria-current="page" tabindex="0">
+            <i class="material-icons mdc-list-item__graphic" aria-hidden="true">home</i>
+            <span class="mdc-list-item__text drawer_text">Home</span>
+          </a>
+          <a class="mdc-list-item " href="scout.html">
+            <i class="material-icons mdc-list-item__graphic" aria-hidden="true">search</i>
+            <span class="mdc-list-item__text drawer_text">Scouting</span>
+          </a>
+          <a class="mdc-list-item " href="kiosk.html">
+            <i class="material-icons mdc-list-item__graphic" aria-hidden="true">dock</i>
+            <span class="mdc-list-item__text drawer_text">Pit Kiosk Mode</span>
+          </a>
+          <a class="mdc-list-item mdc-list-item--activated" href="data.html">
+            <i class="material-icons mdc-list-item__graphic" aria-hidden="true">trending_up</i>
+            <span class="mdc-list-item__text drawer_text">View Data</span>
+          </a>
+          <hr class="mdc-list-divider">
+          <a class="mdc-list-item " href="settings.html">
+            <i class="material-icons mdc-list-item__graphic" aria-hidden="true">settings</i>
+            <span class="mdc-list-item__text drawer_text">Settings</span>
+          </a>
+          <h6 class="mdc-list-group__subheader">FRC Team 2530</h6>
+        </nav>
+        </nav>
+      </div>
+    </aside>
+    <div class="mdc-drawer-scrim"></div>
+
+    <div class="drawer-main-content drawer-frame-app-content" id="main-content">
+      <header class="mdc-top-app-bar drawer-top-app-bar head" data-mdc-auto-init="MDCTopAppBar" id="app-bar">
+        <div class="mdc-top-app-bar__row">
+          <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
+            <button href="#" class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button"
+              data-mdc-auto-init="MDCRipple" id="menuButton">menu</button>
+            <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Change Event"
+              onclick="teamView.close()" id="backButton" hidden>arrow_back</button>
+            <span class="mdc-top-app-bar__title" id="title">View Data</span>
+          </section>
+          <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
+            <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" id="favoriteButton"
+              aria-label="Favorite Team" hidden onclick="favoriteTeam()">favorite_outline</button>
+            <div id="toolbar" class="toolbar mdc-menu-surface--anchor">
+              <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Change Event"
+                id='eventButton' onclick="openEventPicker();">event</button>
+            </div>
+        </div>
+        </section>
+    </div>
+    </header>
+
+    <div class="mdc-top-app-bar--fixed-adjust"></div>
+  </div>
+</body>
+
+<div class="mdc-dialog">
+  <div class="mdc-dialog__container">
+    <div class="mdc-dialog__surface" role="alertdialog" aria-modal="true" aria-labelledby="my-dialog-title"
+      aria-describedby="my-dialog-content">
+      <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
+      <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
+     -->Choose an Event<br>
+        <small class="text-muted text-center">Changing events will delete unsaved data.</small><!--
+   -->
+      </h2>
+      <div class="mdc-dialog__content" id="my-dialog-content">
+        <ul class="mdc-list" id="eventlist">
+        </ul>
+      </div>
+      <div class="mdc-dialog__actions">
+        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
+          <div class="mdc-button__ripple"></div>
+          <span class="mdc-button__label">Cancel</span>
+        </button>
+        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="accept"
+          onclick="setEvent()">
+          <div class="mdc-button__ripple"></div>
+          <span class="mdc-button__label">OK</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="mdc-dialog__scrim"></div>
+</div>
+<style id="display"></style>
+<main class="main-content" id="main-content" tabindex="-1">
+  <script type="text/javascript">
+    window.mdc.autoInit();
+    const list = document.querySelector('.mdc-list').MDCList;
+    list.wrapFocus = true;
+    const drawer = new mdc.drawer.MDCDrawer(document.getElementById('drawer'));
+    const topAppBar = document.querySelector('.mdc-top-app-bar').MDCTopAppBar;
+    topAppBar.setScrollTarget(document.getElementById('main-content'));
+    topAppBar.listen('MDCTopAppBar:nav', () => {
+      drawer.open = !drawer.open;
+    });
+    const listEl = document.querySelector('.mdc-drawer .mdc-list');
+    const mainContentEl = document.querySelector('.main-content');
+
+    listEl.addEventListener('click', (event) => {
+      drawer.open = false;
+    });
+
+    document.body.addEventListener('MDCDrawer:closed', () => {
+      mainContentEl.querySelector('input, button').focus();
+    });
+    const eventPicker = new mdc.dialog.MDCDialog(document.querySelector('.mdc-dialog'));
+  </script>
+  <script type="text/javascript" src="assets/data.js"></script>
+  <script src="assets/charts.js" crossorigin="anonymous"></script>
+  <div hidden id="offline">
+    <img class="offline" src="assets/images/offline.svg">
+    <div class="text-center">
+      <h2>You're Offline</h2>
+      <p>Internet is required to view the latest data.</p>
+    </div>
+  </div>
+  <div class="main-tab" id="main-tab">
+    <h3>View Data</h3>
+    <p>Scan QR codes to download their data, or open a folder to view its contents. You can also view the scouting data
+      on your current device.<br>You can collect data using a USB drive, AirDrop, Nearby Share, or QR Codes.</p>
+    <div>
+      <label class="mdc-button--raised mdc-button mdc-button--icon-leading" for="folderSelect">
+        <span class="mdc-button__ripple"></span>
+        <i class="material-icons mdc-button__icon" aria-hidden="true">folder</i>
+        <span class="mdc-button__label">Open Files</span>
+      </label>
+      <input type="file" webkitdirectory multiple id="folderSelect">
+      <button class="mdc-button mdc-button--icon-leading" onclick="initializeQrReader()">
+        <span class="mdc-button__ripple"></span>
+        <i class="material-icons mdc-button__icon" aria-hidden="true">qr_code_scanner</i>
+        <span class="mdc-button__label">Scan QR Codes</span>
+      </button>
+      <button class="mdc-button mdc-button--icon-leading" onclick="matchData = JSON.parse(localStorage.getItem('matchData'));pitData = JSON.parse(localStorage.getItem('pitData'));showData()">
+        <span class="mdc-button__ripple"></span>
+        <i class="material-icons mdc-button__icon" aria-hidden="true">inventory</i>
+        <span class="mdc-button__label">Show Local Data</span>
+      </button>
+    </div>
+  </div>
+  <div class="container" id='tableContainer' hidden><br>
+    <div class="mdc-data-table">
+      <table class="mdc-data-table__table">
+        <thead>
+          <tr class="mdc-data-table__header-row" id="header-row">
+            <th class="mdc-data-table__header-cell" role="columnheader" scope="col" data-column-id="team" id="bigbrain">
+              <div class="mdc-data-table__header-cell-wrapper">
+                <div class="mdc-data-table__header-cell-label">
+                  Team
+                </div>
+                <div class="mdc-data-table__sort-status-label" aria-hidden="true" id="dessert-status-label">
+                </div>
+              </div>
+            </th>
+        </thead>
+        <tbody class="mdc-data-table__content" id='tableBody'>
+        </tbody>
+      </table>
+
+    </div>
+    <br><br>
+  </div>
+  <div class="mdc-dialog mdc-dialog--fullscreen" id="qrDialog">
+    <div class="mdc-dialog__container">
+      <div class="mdc-dialog__surface" role="dialog" aria-modal="true">
+        <div class="mdc-dialog__header">
+          <h2 class="mdc-dialog__title">Scan QR Codes</h2>
+          <button class="mdc-icon-button material-icons mdc-dialog__close" data-mdc-dialog-action="close"
+            onclick="stopQR()">
+            close
+          </button>
+        </div>
+        <div class="mdc-dialog__content qr-scan-dialog-container">
+          <video id="qr-v"></video>
+          <canvas id="qr-canvas" hidden></canvas>
+          <h5 id="qrHelperText">Looking for QR Codes</h5>
+          <div id="scannedData"></div>
+        </div>
+        <div class="mdc-dialog__actions">
+          <button type="button" id="saveButton" class="mdc-button mdc-dialog__button mdc-button--raised"
+            onclick="saveQRData()" data-mdc-dialog-action="ok" data-mdc-dialog-button-default>
+            <div class="mdc-button__ripple"></div>
+            <span class="material-icons mdc-button__icon">save</span>
+            <span class="mdc-button__label">Save</span>
+          </button>
+        </div>
+        <a hidden id="dataDownloader"></a>
+      </div>
+    </div>
+    <div class="mdc-dialog__scrim"></div>
+  </div>
+  <script>
+    const selector = '.mdc-button, .mdc-icon-button, .mdc-card__primary-action, .mdc-list-item';
+    const ripples = [].map.call(document.querySelectorAll(selector), function (el) {
+      return new mdc.ripple.MDCRipple(el);
+    });
+    var button = document.getElementById('menuButton')
+    var title = document.getElementById('title')
+    var qrDialog = new mdc.dialog.MDCDialog(document.getElementById("qrDialog"));
+    document.getElementById("folderSelect").addEventListener("change", function(){
+      compileData(this.files);
+    });
+  </script>
+  <style>
+    body {
+      background-color: var(--mdc-theme-background, white);
+      overflow-x: hidden;
+    }
+
+    .mdc-card {
+      animation-name: slide-up;
+      animation-duration: 0.5s;
+      display: inline-block;
+      width: 100%;
+    }
+
+    @keyframes slide-up {
+      from {
+        transform: translate(0, 100vh);
+      }
+
+      to {
+        transform: translate(0, 0);
+      }
+    }
+
+    .mdc-data-table__sort-status-label {
+      margin-left: 3px;
+    }
+
+    .mdc-card-columns .mdc-card {
+      margin-bottom: .75rem;
+      margin-left: 0;
+    }
+
+    @media (min-width:556px) {
+      .mdc-card-columns {
+        -webkit-column-count: 2;
+        -moz-column-count: 2;
+        column-count: 2;
+        -webkit-column-gap: 1.25rem;
+        -moz-column-gap: 1.25rem;
+        column-gap: 1.25rem;
+        orphans: 1;
+        widows: 1
+      }
+
+      .mdc-card-columns .mdc-card {
+        display: inline-block;
+        width: 100%
+      }
+    }
+
+    @media (min-width:900px) {
+      .mdc-card-columns {
+        -webkit-column-count: 3;
+        -moz-column-count: 3;
+        column-count: 3;
+        -webkit-column-gap: 1.25rem;
+        -moz-column-gap: 1.25rem;
+        column-gap: 1.25rem;
+        orphans: 1;
+        widows: 1
+      }
+
+      .mdc-card-columns .mdc-card {
+        display: inline-block;
+        width: 100%
+      }
+    }
+
+    .mdc-card-columns {
+      margin: 0px;
+    }
+
+    .qr-result {
+      padding: 10px;
+    }
+  </style>
+  <div class="container" id="teamInfoContainer" hidden>
+    <div class="mdc-card-columns" id="teamInfoColumns">
+
+    </div>
+
+  </div>
+  <div class="mdc-snackbar" id="snackbar">
+    <div class=mdc-snackbar__surface>
+      <div class=mdc-snackbar__label aria-live=polite role=status>There was an error</div>
+    </div>
+  </div>
+  <script>
+    const dataTable = new mdc.dataTable.MDCDataTable(document.querySelector('.mdc-data-table'));
+    const snackbar = new mdc.snackbar.MDCSnackbar(document.getElementById('snackbar'));
+  </script>
+  <br><br><br>
+  <style>
+    .login {
+      display: block;
+      align-self: center;
+      margin-left: auto;
+      margin-right: auto;
+      width: 70vw;
+      max-width: 500px;
+    }
+
+    .mdc-text-field {
+      width: 90vw;
+      max-width: 400px;
+    }
+
+    .table-actions {
+      overflow-y: scroll;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .mdc-button a {
+      text-decoration: none;
+    }
+
+    .key {
+      padding-top: 20px;
+      columns: 4;
+      text-align: center;
+    }
+
+    .key-icon {
+      font-size: 50px;
+      font-family: 'Material Icons';
+      color: var(--mdc-theme-primary, black);
+      padding-bottom: 20px;
+    }
+
+    .disappearing {
+      animation-name: fade-out;
+      animation-duration: 0.2s;
+    }
+
+    .appearing {
+      filter: none;
+      animation-name: fade-out;
+      animation-direction: reverse;
+      animation-duration: 0.2s;
+      position: fixed;
+    }
+
+    @keyframes fade-out {
+      from {
+        filter: opacity(100%);
+        transform: scale(1.0);
+      }
+
+      to {
+        filter: opacity(0%);
+        transform: scale(0.7);
+      }
+    }
+
+    #comments {
+      padding-top: 16px;
+      display: none;
+      list-style-type: none;
+    }
+
+    #comments li {
+      padding-bottom: 8px !important;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .main-tab {
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      height: 100%;
+      text-align: center;
+    }
+    
+    #folderSelect{
+      position:absolute;
+      top:-1000px;
+    }
+  </style>
