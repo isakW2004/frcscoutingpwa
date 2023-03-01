@@ -625,6 +625,10 @@ function qrShare(){
     document.getElementById("qrOptions").addEventListener("change", updateQR);
 }
 
+var currentQrExport = new Object;
+var qrExportType;
+var qrExportTeam;
+
 function updateQR(e){
     var radios = document.getElementById("qrTeamOptions").querySelectorAll('.mdc-radio__native-control');
     var teamToExport;
@@ -677,19 +681,46 @@ function updateQR(e){
                 customRangeText.valid = false;
             }
         }
+        var matchesExported = [];
         var data = JSON.parse(localStorage.getItem("matchData"))["team"+teamToExport];
         if(typeof matchesToSkip.match["team" + teamToExport] != "undefined"){
             for(var i = 0; i < data.length; i++){
                 if(matchesToSkip.match["team" + teamToExport].indexOf(data[i].matchNumber) != -1){
                     data.splice(i, 1);
+                }else{
+                    matchesExported.push(data[i].matchNumber);
                 }
             }
         }else{
             matchesToSkip.match["team" + teamToExport] = [];
         }
+        currentQrExport["team" + teamToExport] = matchesExported;
+        qrExportType="match";
+        qrExportTeam = teamToExport;
         data.unshift({team:teamToExport});
     }
     makeQR(JSON.stringify(data));
+}
+
+function addToScanned(){
+    if(localStorage.getItem("qrExportedData") == null){
+        matchesToSkip = {match:{}, pit:[]};
+    }else{
+        matchesToSkip = JSON.parse(localStorage.getItem("qrExportedData"));
+    }
+    if(qrExportType == "match"){
+        if(typeof matchesToSkip.match["team"+qrExportTeam] == "undefined"){
+            matchesToSkip.match["team"+qrExportTeam] = [];
+        }
+        for(var match of currentQrExport["team"+qrExportTeam]){
+            matchesToSkip.match["team"+qrExportTeam].push(match);
+        }
+    }else{
+        for(var team of currentQrExport.pit){
+            matchesToSkip.pit.push(team);
+        }
+    }
+    localStorage.setItem("qrExportedData", JSON.stringify(matchesToSkip));
 }
 
 var downloader = document.createElement("a")

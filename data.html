@@ -192,7 +192,7 @@
         <i class="material-icons mdc-button__icon" aria-hidden="true">qr_code_scanner</i>
         <span class="mdc-button__label">Scan QR Codes</span>
       </button>
-      <button class="mdc-button mdc-button--icon-leading" onclick="matchData = JSON.parse(localStorage.getItem('matchData'));pitData = JSON.parse(localStorage.getItem('pitData'));showData()">
+      <button class="mdc-button mdc-button--icon-leading" onclick="matchData = pitData =  (localStorage.getItem('matchData') != null) ? JSON.parse(localStorage.getItem('matchData')):[];pitData =  (localStorage.getItem('pitData') != null) ? JSON.parse(localStorage.getItem('pitData')):[];showData()">
         <span class="mdc-button__ripple"></span>
         <i class="material-icons mdc-button__icon" aria-hidden="true">inventory</i>
         <span class="mdc-button__label">Show Local Data</span>

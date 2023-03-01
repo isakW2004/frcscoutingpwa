@@ -624,11 +624,14 @@ async function compileData(files){
   try{
     var i = 0;
     for await(const file of files){
-      if(file.name.search("match") != -1){
-        console.log(file.text());
-        matchFileObjs.push(JSON.parse(await file.text()));
-      }else{
-        pitFileObjs.push(JSON.parse(await file.text()));
+      console.log(files);
+      if(file.type == "application/json"){
+        if(file.name.search("match") != -1){
+          console.log(file.text());
+          matchFileObjs.push(JSON.parse(await file.text()));
+        }else{
+          pitFileObjs.push(JSON.parse(await file.text()));
+        }
       }
       i++;
     }
