@@ -68,14 +68,12 @@ const standFields = [
   {
       "type": "number",
       "title": "Cones Scored",
-      "shortTitle":"Cones",
       "id": "cones",
       "weight": 2
   },
   {
       "type": "number",
-      "title": "Cubes Scored",
-      "shortTitle":"Cubes",
+      "title": "Marshmallows Scored",
       "id": "cubes",
       "weight": 1
   },
@@ -95,7 +93,6 @@ const standFields = [
       "type": "scale",
       "title": "Rate the Performance",
       "id": "rating",
-      "shortTitle":"Rating",
       "min" : 1,
       "max" : 10
   },
@@ -103,6 +100,7 @@ const standFields = [
       "type": "text",
       "title": "Comments",
       "id": "comment",
+      "isTextArea" : true,
   },
   {
       "type": "checkbox",
@@ -117,7 +115,6 @@ const standFields = [
   {
       "type": "checkbox",
       "title": "Match Won?",
-      "shortTitle":"Won Match",
       "id": "won",
   },
 ];
@@ -140,7 +137,7 @@ const pitFields = [
   },
   {
       "type": "checkbox",
-      "title": "Can Pick Up Tipped Cones",
+      "title": "Can Pick Up and Score Tipped Cones",
       "id": "tippedCones",
   },
   {
@@ -158,6 +155,7 @@ const pitFields = [
   {
       "type": "text",
       "title": "Describe Grabber Mechanism",
+      "isTextArea" : true,
       "id": "grabber",
   },
   {
@@ -181,6 +179,7 @@ const pitFields = [
   {
       "type": "text",
       "title": "Comments",
+      "isTextArea" : true,
       "id": "comment",
   },
 ]

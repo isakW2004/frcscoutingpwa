@@ -43,3 +43,16 @@ function setEvent(){
   }
   document.location.reload();
 }
+
+async function forceUpdate(){
+  if(window.confirm("Force update? You will need to be online")){
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    const unregisterPromises = registrations.map(registration => registration.unregister());
+  
+    const allCaches = await caches.keys();
+    const cacheDeletionPromises = allCaches.map(cache => caches.delete(cache));
+  
+    await Promise.all([...unregisterPromises, ...cacheDeletionPromises]);
+    window.location.reload();
+  }
+}

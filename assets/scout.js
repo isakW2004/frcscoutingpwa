@@ -129,10 +129,13 @@ function scoutingBoard() {
     teamsStand = JSON.parse(localStorage.getItem("teamsStand"));
     matchesStand = JSON.parse(localStorage.getItem("matchesStand"));
     matchesStandDetails = JSON.parse(localStorage.getItem("matchesStandDetails"));
-    matchesStand.sort(function (a, b) { return a - b });
     document.getElementById("standscout").innerHTML = "<h2 class='text-center'>Qualifier Matches</h2>"
-    document.getElementById("standscout").innerHTML = document.getElementById("standscout").innerHTML + '<ul class="mdc-list mdc-list--two-line scoutlist">';
-    var i;
+    document.getElementById("standscout").innerHTML += '<ul class="mdc-list mdc-list--two-line scoutlist">';
+    if(matchesStand == null){
+        document.getElementById("standscout").innerHTML = "<h2 class='text-center'>No Qualifier Matches Available</h2>"
+        matchesStand = [];
+    }
+    matchesStand.sort(function (a, b) { return a - b });
     for (const match of matchesStand) {
         var listItem = document.createElement("li");
         listItem.classList.add("`mdc-list-item`");
@@ -171,8 +174,6 @@ function selectTab(tab) {
     }
 }
 
-
-/* Field IDs can't contain numbers! */
 const standFields = [
     {
         "type": "number",
@@ -209,6 +210,7 @@ const standFields = [
         "type": "text",
         "title": "Comments",
         "id": "comment",
+        "isTextArea" : true,
     },
     {
         "type": "checkbox",
@@ -245,7 +247,7 @@ const pitFields = [
     },
     {
         "type": "checkbox",
-        "title": "Can Pick Up Tipped Cones",
+        "title": "Can Pick Up and Score Tipped Cones",
         "id": "tippedCones",
     },
     {
@@ -263,6 +265,7 @@ const pitFields = [
     {
         "type": "text",
         "title": "Describe Grabber Mechanism",
+        "isTextArea" : true,
         "id": "grabber",
     },
     {
@@ -286,6 +289,7 @@ const pitFields = [
     {
         "type": "text",
         "title": "Comments",
+        "isTextArea" : true,
         "id": "comment",
     },
 ]
@@ -381,9 +385,16 @@ function createField(field, team) {
         node.appendChild(wrapper);
     } else if (field.type == "text") {
         node.classList.value = "mdc-text-field mdc-text-field--outlined";
-        node.innerHTML += '<input type="text" class="mdc-text-field__input" tabindex="1"><span class="mdc-notched-outline"><span class="mdc-notched-outline__leading"></span><span class="mdc-notched-outline__notch"><span class="mdc-floating-label"></span></span><span class="mdc-notched-outline__trailing"></span></span>';
-        node.querySelector("input").dataset.team = team;
-        node.querySelector("input").dataset.id = field.id;
+        if(field.isTextArea){
+            node.classList.add("mdc-text-field--textarea");
+            node.innerHTML += '<span class=mdc-notched-outline><span class=mdc-notched-outline__leading></span><span class="mdc-notched-outline__notch"><span class="mdc-floating-label"></span></span><span class=mdc-notched-outline__trailing></span> </span><span class=mdc-text-field__resizer><textarea aria-label=Label class=mdc-text-field__input></textarea></span>';
+            node.querySelector("textarea").dataset.team = team;
+            node.querySelector("textarea").dataset.id = field.id;
+        }else{
+            node.innerHTML += '<input type="text" class="mdc-text-field__input" tabindex="1"><span class="mdc-notched-outline"><span class="mdc-notched-outline__leading"></span><span class="mdc-notched-outline__notch"><span class="mdc-floating-label"></span></span><span class="mdc-notched-outline__trailing"></span></span>';
+            node.querySelector("input").dataset.team = team;
+            node.querySelector("input").dataset.id = field.id;
+        }
         node.querySelector(".mdc-floating-label").innerText = field.title;
         element = new mdc.textField.MDCTextField(node);
     } else if (field.type == "dropdown") {
@@ -552,6 +563,13 @@ function savePitAnswers(){
             currentPitData[pitFields[i].id] = getValueOfField(row.fields[i]);
         }
         pitData["team" + row.team] = currentPitData;
+        var checkedItems = JSON.parse(localStorage.getItem("checkedItems"));
+        if(checkedItems == null){
+            checkedItems = [];
+        }
+        checkedItems.push("team" + row.team);
+        localStorage.setItem("checkedItems", JSON.stringify(checkedItems));
+        document.getElementById("pit" + row.team +"checkbox").checked=true;
     }
     localStorage.setItem("pitData", JSON.stringify(pitData));
     snackbar.labelText= "Answers Saved. Thank You!";
@@ -598,18 +616,20 @@ function qrShare(){
     matchData = localStorage.getItem("matchData")
     options.innerHTML = "";
     var teamList = document.createElement("form")
-    for(var key of Object.keys(JSON.parse(matchData))){
-        var listItem = document.createElement("div");
-        var radioButton = document.createElement("div");
-        radioButton.classList.add("mdc-radio")
-        radioButton.innerHTML = "<input class=mdc-radio__native-control name=radios data-value="+key.split("team")[1]+" type=radio><div class=mdc-radio__background><div class=mdc-radio__outer-circle></div><div class=mdc-radio__inner-circle></div></div><div class=mdc-radio__ripple></div>";
-        listItem.appendChild(radioButton);
-        var label = document.createElement('label');
-        label.classList.add("mdc-radio");
-        label.innerText = "Team " + key.split("team")[1];
-        listItem.appendChild(label);
-        teamList.appendChild(listItem);
-        new mdc.radio.MDCRadio(radioButton);
+    if(matchData != null){
+        for(var key of Object.keys(JSON.parse(matchData))){
+            var listItem = document.createElement("div");
+            var radioButton = document.createElement("div");
+            radioButton.classList.add("mdc-radio")
+            radioButton.innerHTML = "<input class=mdc-radio__native-control name=radios data-value="+key.split("team")[1]+" type=radio><div class=mdc-radio__background><div class=mdc-radio__outer-circle></div><div class=mdc-radio__inner-circle></div></div><div class=mdc-radio__ripple></div>";
+            listItem.appendChild(radioButton);
+            var label = document.createElement('label');
+            label.classList.add("mdc-radio");
+            label.innerText = "Team " + key.split("team")[1];
+            listItem.appendChild(label);
+            teamList.appendChild(listItem);
+            new mdc.radio.MDCRadio(radioButton);
+        }
     }
     var listItem = document.createElement("div");
     var radioButton = document.createElement("div");
@@ -750,7 +770,7 @@ function nativeShare(){
         files.push(new File([localStorage.getItem("matchData")], "matchData.json", {type:"application/json"}));
     }
     if(localStorage.getItem("pitData") != null){
-        files.push(new File([localStorage.getItem("pitData")], "matchData.json", {type:"application/json"}));
+        files.push(new File([localStorage.getItem("pitData")], "pitData.json", {type:"application/json"}));
     }
     var data = {files:files, title:"Scouting Data", text:"Here's some cool scouting data"};
     if(navigator.canShare(data)){
