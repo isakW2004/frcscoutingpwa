@@ -596,6 +596,7 @@ function qrShare(){
     qrDialog.open();
     var options = document.getElementById("qrTeamOptions");
     matchData = localStorage.getItem("matchData")
+    options.innerHTML = "";
     var teamList = document.createElement("form")
     for(var key of Object.keys(JSON.parse(matchData))){
         var listItem = document.createElement("div");
