@@ -68,19 +68,11 @@
             <i class="material-icons mdc-list-item__graphic" aria-hidden="true">search</i>
             <span class="mdc-list-item__text drawer_text">Scouting</span>
           </a>
-          <a class="mdc-list-item " href="kiosk.html">
-            <i class="material-icons mdc-list-item__graphic" aria-hidden="true">dock</i>
-            <span class="mdc-list-item__text drawer_text">Pit Kiosk Mode</span>
-          </a>
           <a class="mdc-list-item mdc-list-item--activated" href="data.html">
             <i class="material-icons mdc-list-item__graphic" aria-hidden="true">trending_up</i>
             <span class="mdc-list-item__text drawer_text">View Data</span>
           </a>
           <hr class="mdc-list-divider">
-          <a class="mdc-list-item " href="settings.html">
-            <i class="material-icons mdc-list-item__graphic" aria-hidden="true">settings</i>
-            <span class="mdc-list-item__text drawer_text">Settings</span>
-          </a>
           <span class="mdc-list-item" onclick="forceUpdate()">
             <i class="material-icons mdc-list-item__graphic" aria-hidden="true">system_update_alt</i>
             <span class="mdc-list-item__text drawer_text">Force Update</span>
@@ -108,6 +100,8 @@
             <div id="toolbar" class="toolbar mdc-menu-surface--anchor">
               <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Change Event"
                 id='eventButton' onclick="openEventPicker();">event</button>
+                <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Consolidate Data"
+                onclick="consolidateData();">call_merge</button>
             </div>
         </div>
         </section>
@@ -430,7 +424,6 @@
     #comments li {
       padding-bottom: 8px !important;
       text-overflow: ellipsis;
-      white-space: nowrap;
       overflow: hidden;
     }
 
@@ -447,5 +440,14 @@
     #folderSelect{
       position:absolute;
       top:-1000px;
+    }
+    
+    .pit-list-item .mdc-list-item__secondary-text{
+      white-space: normal;
+    }
+    
+    .data-card{
+      display:grid;
+      grid-template-columns: 50% 50%;
     }
   </style>

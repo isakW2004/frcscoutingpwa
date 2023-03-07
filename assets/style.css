@@ -33,11 +33,11 @@
     font-size: 70px;
 }
 .welcome-links>a>*{
-    color:var(--mdc-theme-text-secondary-on-background, black);
+    color:var(--mdc-theme-text-primary-on-background, black);
     display: inline-block;
 }
 .welcome-links>a:visited>*{
-    color:var(--mdc-theme-text-secondary-on-background, black);
+    color:var(--mdc-theme-text-primary-on-background, black);
 }
 .container:active{
     border: none;
@@ -47,25 +47,6 @@ textarea:focus, input:focus{
 }
 *:focus {
     outline: none;
-}
-.aboutus{
-  background-image: url("images/teamphoto.jpg");
-  height: 50vh;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  width: 100%;
-  text-align: center;
-  margin-top: 100px;
-  border-radius: 25px
-}
-.aboutus>h1{
-    margin-top: 15vh;
-    color: white;
-    font-weight: bold;
-}
-.kiosk-container{
-    margin-top: 30px;
 }
 .side-number{
     color: var(--mdc-theme-primary,#7DC834);
@@ -217,13 +198,12 @@ div.fade{
     margin: 15px;
 }
 .noselect{
-    -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-     -khtml-user-select: none; /* Konqueror HTML */
-       -moz-user-select: none; /* Old versions of Firefox */
-        -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Non-prefixed version, currently
-                                  supported by Chrome, Edge, Opera and Firefox */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+     -khtml-user-select: none; 
+       -moz-user-select: none; 
+        -ms-user-select: none; 
+            user-select: none;
 }
 .mdc-data-table__header-cell, .mdc-data-table__cell, .mdc-data-table__header-cell--sorted .mdc-data-table__sort-icon-button{
     color: var(--mdc-theme-text-primary-on-background, black)
@@ -298,14 +278,24 @@ noscript {
 .qr-dialog-container{
     width: 100%;
     height:100%;
-    display:flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    display:grid;
+    grid-template-rows: 50% 50%;
+    overflow: hidden;
+}
+#qrOptions{
+    overflow: scroll;
+}  
+#qrcanv{
+    max-width: 100%;
+    max-height: 100%;
 }
 @media only screen and (min-width: 672px){
-    #scoutForm, .qr-dialog-container{
+    #scoutForm{
         flex-direction: row;
+    }
+    .qr-dialog-container{
+        grid-template-columns: 50% 50%;
+        grid-template-rows: initial;
     }
 }
 .scale-wrapper{
@@ -318,4 +308,31 @@ noscript {
     position:fixed;
     right:20px;
     bottom:20px;
+}
+
+@media (prefers-color-scheme: dark){
+    html, body, main{
+        background-color: black;
+        color:white;
+        --mdc-theme-text-primary-on-background: white;
+        --mdc-theme-text-icon-on-background: rgba(255, 255, 255, 0.75);
+        --mdc-theme-on-surface:white;
+        --mdc-theme-surface: #232323;
+    }
+    .mdc-list-item *, .mdc-list-item__text>*, .scouting-dialog-container *, .mdc-deprecated-list-item{
+        color:white !important;
+    }
+    .mdc-top-app-bar, .mdc-dialog__surface, .mdc-menu--surface{
+        background-color: #232323 !important;
+        color:white;
+    }
+    .mdc-tab:not(.mdc-tab--active) .mdc-tab__text-label, .mdc-tab:not(.mdc-tab--active) .mdc-tab__icon{
+        color: rgba(255, 255, 255, 0.6);
+    }
+}
+.red-alliance-text{
+    color: #da3434 !important;
+}
+.blue-alliance-text{
+    color: #487fcc !important;
 }

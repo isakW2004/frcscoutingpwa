@@ -83,14 +83,21 @@ function removeDuplicates(array) {
     return unique;
 }
 
-var matchesStandDetails = []
+var matchesStandDetails = new Object;
 
-function pushToMatches(match, team) {
-    if (typeof matchesStandDetails[match] === 'undefined') {
-        matchesStandDetails[match] = { "match_number": match, 'teams': [], }
-        matchesStandDetails[match].teams.push(team);
-    } else {
-        matchesStandDetails[match].teams.push(team);
+function pushToMatches(match, team, unixTime, alliances) {
+    if (typeof matchesStandDetails[match] == 'undefined') {
+        matchesStandDetails[match] = new Object;
+        matchesStandDetails[match].match_number = match;
+        if(typeof matchesStandDetails[match].team == "undefined"){
+            matchesStandDetails[match].alliances = {red:[], blue:[]};
+        }
+        matchesStandDetails[match].time = (new Date(unixTime * 1000)).toLocaleTimeString([],{hour:"numeric", minute:"2-digit"});
+    }
+    if(alliances.red.team_keys.indexOf("frc"+team) == -1){
+        matchesStandDetails[match].alliances.red.push(team);
+    }else{
+        matchesStandDetails[match].alliances.blue.push(team);
     }
 }
 
@@ -104,10 +111,11 @@ async function fetchMatchesAjax(team, matches) {
             success: function (contents) {
                 for (var match of contents) {
                     if (match.comp_level === "qm") {
-                        pushToMatches(match.match_number, matches);
+                        pushToMatches(match.match_number, matches, match.predicted_time, match.alliances);
                         matchesStandScouting.push(match.match_number);
                         matchesStandScouting = removeDuplicates(matchesStandScouting);
                     }
+                    console.log(match)
                     localStorage.setItem("matchesStand", JSON.stringify(matchesStandScouting));
                     localStorage.setItem("matchesStandDetails", JSON.stringify(matchesStandDetails));
                 }
@@ -138,8 +146,8 @@ function scoutingBoard() {
     matchesStand.sort(function (a, b) { return a - b });
     for (const match of matchesStand) {
         var listItem = document.createElement("li");
-        listItem.classList.add("`mdc-list-item`");
-        listItem.innerHTML = '<span class="mdc-list-item__text"><span class="mdc-list-item__primary-text">Match ' + match + '</span><span class="mdc-list-item__secondary-text">' + matchesStandDetails[match].teams.toString() + '</span></span>';
+        listItem.classList.add("mdc-list-item");
+        listItem.innerHTML = '<span class="mdc-list-item__text"><span class="mdc-list-item__primary-text">Match ' + match + '</span><span class="mdc-list-item__secondary-text">'+((matchesStandDetails[match].alliances.red.length != 0) ? '<span class="red-alliance-text">'+ matchesStandDetails[match].alliances.red.join(" ") + ' </span>' : "") + '<span class="blue-alliance-text">' + matchesStandDetails[match].alliances.blue.join(" ") + '</span> ~' + matchesStandDetails[match].time + '</span></span>';
         listItem.onclick = function(){
             openMatchScoutForm(match);
         };
@@ -188,7 +196,7 @@ const standFields = [
         "weight": 1
     },
     {
-        "type": "dropdown",
+        "type": "multi-select",
         "title": "Autonomous",
         "id": "auto",
         "options" : ["No Autonomous", "Autonomous did not work", "Left Community", "Scored", "Docked not engaged", "Docked and Engaged"]
@@ -275,7 +283,7 @@ const pitFields = [
         "options" : ["Tank", "West Coast Drive", "Swerve", "Mecanum", "Other (add comment)"]
     },
     {
-        "type": "dropdown",
+        "type": "multi-select",
         "title": "Autonomous Strategy",
         "id": "auto",
         "options" : ["No Autonomous", "Leaving Community", "Scored", "Docked not engaged", "Docked and Engaged"]
@@ -399,7 +407,7 @@ function createField(field, team) {
         element = new mdc.textField.MDCTextField(node);
     } else if (field.type == "dropdown") {
         node.classList.value = "mdc-select mdc-select--outlined";
-        node.innerHTML += '<div class="mdc-select mdc-select--outlined"><div class=mdc-select__anchor><span class=mdc-notched-outline><span class=mdc-notched-outline__leading></span> <span class=mdc-notched-outline__notch><span class=mdc-floating-label></span> </span><span class=mdc-notched-outline__trailing></span> </span><span class=mdc-select__selected-text-container><span class="mdc-select__selected-text"></span> </span><span class=mdc-select__dropdown-icon><svg class=mdc-select__dropdown-icon-graphic focusable=false viewBox="7 10 10 5"><polygon class=mdc-select__dropdown-icon-inactive fill-rule=evenodd points="7 10 12 15 17 10"stroke=none></polygon><polygon class=mdc-select__dropdown-icon-active fill-rule=evenodd points="7 15 12 10 17 15"stroke=none></polygon></svg></span></div><div class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth" role="listbox"><ul class="mdc-deprecated-list"></ul></div>';
+        node.innerHTML += '<div class=mdc-select__anchor><span class=mdc-notched-outline><span class=mdc-notched-outline__leading></span> <span class=mdc-notched-outline__notch><span class=mdc-floating-label></span> </span><span class=mdc-notched-outline__trailing></span> </span><span class=mdc-select__selected-text-container><span class="mdc-select__selected-text"></span> </span><span class=mdc-select__dropdown-icon><svg class=mdc-select__dropdown-icon-graphic focusable=false viewBox="7 10 10 5"><polygon class=mdc-select__dropdown-icon-inactive fill-rule=evenodd points="7 10 12 15 17 10"stroke=none></polygon><polygon class=mdc-select__dropdown-icon-active fill-rule=evenodd points="7 15 12 10 17 15"stroke=none></polygon></svg></span></div><div class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth" role="listbox"><ul class="mdc-deprecated-list"></ul>';
         node.dataset.team = team;
         node.dataset.id = field.id;
         node.querySelector(".mdc-floating-label").innerText = field.title;
@@ -413,6 +421,29 @@ function createField(field, team) {
             list.appendChild(item)
         }
         element = new mdc.select.MDCSelect(node);
+    }else if (field.type == "multi-select") {
+        node.classList.value = "mdc-select mdc-select--outlined";
+        node.innerHTML += '<div class=mdc-select__anchor><span class=mdc-notched-outline><span class=mdc-notched-outline__leading></span> <span class=mdc-notched-outline__notch><span class=mdc-floating-label></span> </span><span class=mdc-notched-outline__trailing></span> </span><span class=mdc-select__selected-text-container><span class="mdc-select__selected-text"></span> </span><span class=mdc-select__dropdown-icon><svg class=mdc-select__dropdown-icon-graphic focusable=false viewBox="7 10 10 5"><polygon class=mdc-select__dropdown-icon-inactive fill-rule=evenodd points="7 10 12 15 17 10"stroke=none></polygon><polygon class=mdc-select__dropdown-icon-active fill-rule=evenodd points="7 15 12 10 17 15"stroke=none></polygon></svg></span></div><div class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth" role="listbox"><ul class="mdc-deprecated-list"></ul>';
+        node.querySelector(".mdc-floating-label").innerText = field.title;
+        var list = node.querySelector(".mdc-deprecated-list");
+        element = [];
+        for(var i = 0; i < field.options.length; i++){
+            var item = document.createElement("li");
+            item.classList.value = "mdc-list-item";
+            item.dataset.value = i;
+            item.setAttribute("role", "option")
+            item.innerHTML = '<span class=mdc-list-item__ripple></span> <span class=mdc-list-item__graphic><div class=mdc-checkbox><input class=mdc-checkbox__native-control type=checkbox><div class=mdc-checkbox__background><svg class=mdc-checkbox__checkmark viewBox="0 0 24 24"><path class=mdc-checkbox__checkmark-path d="M1.73,12.91 8.1,19.28 22.79,4.59"fill=none /></svg><div class=mdc-checkbox__mixedmark></div></div></div></span><label class=mdc-list-item__text></label>';
+            item.querySelector(".mdc-list-item__text").innerText = field.options[i];
+            item.querySelector("input").dataset.value = i;
+            list.appendChild(item);
+            element.push(item.querySelector("input"));
+        }
+        var select = new mdc.select.MDCSelect(node);
+        console.log(select);
+        node.addEventListener("change", function(e){
+            select.foundation.blur = function(){select.root.classList.remove("mdc-select--focused")};
+            select.selectedText.innerText = getValueOfField([node, element, field.type]).length + " Items Selected"
+        })
     }
     return [node, element, field.type];
 }
@@ -470,7 +501,8 @@ function openMatchScoutForm(match){
     scoutDialog.open();
     scoutDialog.root.querySelector(".mdc-dialog__title").innerText = "Match " + match;
     if(matchesStandDetails[match] != null){
-        for(var team of matchesStandDetails[match].teams){
+        var teams = matchesStandDetails[match].alliances.red.concat(matchesStandDetails[match].alliances.blue)
+        for(var team of teams){
             form.appendChild(makeTeamFormRow(team, true));
         }
     }
@@ -522,6 +554,14 @@ function getValueOfField(field){
             }
         }
         return selectedIndex;
+    }else if(field[2] == "multi-select"){
+        var selectedIndexes = [];
+        for(var checkbox of field[1]){
+            if(checkbox.checked){
+                selectedIndexes.push(parseInt(checkbox.dataset.value));
+            }
+        }
+        return selectedIndexes;
     }
     return null;
 }
@@ -577,24 +617,19 @@ function savePitAnswers(){
 }
 
 function makeQR(text){
-    var wd, ht, qrc, elem;
-    wd = window.innerWidth/2;
-    ht = window.innerHeight*0.9;
-
+    var wd = window.innerWidth;
+    var ht = window.innerHeight;
     var elem = document.getElementById('qrcanv');
-    qrc = elem.getContext('2d');
-    qrc.canvas.width = wd > ht ? ht : wd;
-    qrc.canvas.height = wd > ht ? ht : wd;
+    var qrc = elem.getContext('2d');
+    qrc.canvas.width = wd > ht ? wd : ht;
+    qrc.canvas.height = wd > ht ? wd : ht;
     qrc.fillStyle = '#eee';
     qrc.fillRect(0,0,wd,ht);
     qf = genframe(text);
     qrc.lineWidth=1;
 
     var i,j;
-    px = wd;
-    if( ht < wd ){
-        px = ht;
-    }
+    px = wd > ht ? wd : ht;;
     px /= width+10;
     px=Math.round(px - 0.5);
     qrc.clearRect(0,0,wd,ht);

@@ -1,7 +1,7 @@
 {
-  "short_name": "2530 Events",
-  "name": "2530 Events",
-  "description": "Scouting, Kiosk, and more. Offline.",
+  "short_name": "Swerve",
+  "name": "Swerve Scout",
+  "description": "Scout, view data, and more. All offline.",
   "icons": [
     {
       "src": "assets/images/icon-192.png",
@@ -20,24 +20,24 @@
       "purpose": "maskable"
     }
   ],
-  "start_url": "https://isakw2004.github.io/frcscoutingpwa/",
+  "start_url": "https://isakw2004.github.io/swerve-scout/",
   "background_color": "#7DC834",
   "display": "standalone",
-  "scope": "https://isakw2004.github.io/frcscoutingpwa/",
+  "scope": "https://isakw2004.github.io/swerve-scout/",
   "theme_color": "#7DC834",
   "shortcuts": [
     {
       "name": "Scouting",
       "short_name": "Scouting",
       "description": "Pit or stand scouting",
-      "url": "https://isakw2004.github.io/frcscoutingpwa/scout.html",
+      "url": "https://isakw2004.github.io/swerve-scout/scout.html",
       "icons": [{ "src": "assets/images/icon-512.png", "sizes": "192x192" }]
     },
     {
       "name": "View Data",
       "short_name": "Data",
       "description": "View data provided by scouts",
-      "url": "https://isakw2004.github.io/frcscoutingpwa/data.html",
+      "url": "https://isakw2004.github.io/swerve-scout/data.html",
       "icons": [{ "src": "assets/images/icon-512.png", "sizes": "192x192" }]
     }
   ]

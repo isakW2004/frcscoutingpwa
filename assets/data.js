@@ -78,7 +78,7 @@ const standFields = [
       "weight": 1
   },
   {
-      "type": "dropdown",
+      "type": "multi-select",
       "title": "Autonomous",
       "id": "auto",
       "options" : ["No Autonomous", "Autonomous did not work", "Left Community", "Scored", "Docked not engaged", "Docked and Engaged"]
@@ -165,7 +165,7 @@ const pitFields = [
       "options" : ["Tank", "West Coast Drive", "Swerve", "Mecanum", "Other (add comment)"]
   },
   {
-      "type": "dropdown",
+      "type": "multi-select",
       "title": "Autonomous Strategy",
       "id": "auto",
       "options" : ["No Autonomous", "Leaving Community", "Scored", "Docked not engaged", "Docked and Engaged"]
@@ -222,13 +222,16 @@ function getStandAverage(id, number) {
     var sum = 0;
     var nonAnsers = 0;
     for (var match of matches) {
-      if (match[id] != -1) {
+      if (match[id] != -1 && !isNaN(parseInt(match[id]))) {
         sum += parseInt(match[id]);
       } else {
         nonAnsers++;
       }
     }
-    return sum / matches.length - nonAnsers;
+    if(matches.length - nonAnsers == 0){
+      return "-";
+    }
+    return sum / (matches.length - nonAnsers);
   } catch {
     return "-";
   }
@@ -257,7 +260,7 @@ const teamView = {
     setTimeout(function () { document.getElementById('tableContainer').hidden = true; document.getElementById('tableContainer').classList.remove('disappearing') }, 200);
     document.getElementById('teamInfoContainer').hidden = false;
     if (team.team_number == 2530) {
-      team.nickname = "Incornceivable"
+      team.nickname = "Incornceivable";
     }
     title.innerHTML = "Team " + team.team_number + " " + team.nickname;
     button.hidden = true;
@@ -281,22 +284,26 @@ const teamView = {
       for (var i = 0; i < standFields.length; i++) {
         if (standFields[i].type == 'checkbox') {
           if (document.getElementById('card-checkbox') == null) {
-            teamInfoColumns.innerHTML += '<div class="mdc-card" id="card-checkbox"><div class="mdc-card__primary-action noselect" tabindex="0" style="padding: 16px;"><h5 style="margin-bottom: 0px;">Checkboxes</h5><div class="text-center" style="display:flex; justify-content: center;" id="checkboxCardData"></div></div></div>';
+            teamInfoColumns.innerHTML += '<div class="mdc-card" id="card-checkbox"><div class="mdc-card__primary-action noselect" tabindex="0" style="padding: 16px;"><h5 style="margin-bottom: 0px;">Checkboxes</h5><div class="data-card" id="checkboxCardData"></div></div></div>';
           }
           document.getElementById("checkboxCardData").innerHTML += '<div style="margin: 16px;"><h1 class="side-icon" style="margin-bottom: 0px;">' + checkboxes.allDone(standFields[i].id, team.team_number, 'stand') + '</h1><strong>' + standFields[i].title + '</strong><br><small class="text-muted">' + checkboxes.getPercentage(standFields[i].id, team.team_number, 'stand') + '% checked</small></div>'
         } else if (standFields[i].type == 'number') {
           if (document.getElementById('card-number') == null) {
-            teamInfoColumns.innerHTML += '<div class="mdc-card" id="card-number"><div class="mdc-card__primary-action noselect" tabindex="0" style="padding: 16px;"><h5 style="margin-bottom: 0px;">Numbers</h5><div class="text-center" style="display:flex; justify-content: center;" id="numberCardData"></div></div></div>';
+            teamInfoColumns.innerHTML += '<div class="mdc-card" id="card-number"><div class="mdc-card__primary-action noselect" tabindex="0" style="padding: 16px;"><h5 style="margin-bottom: 0px;">Numbers</h5><div class="data-card" id="numberCardData"></div></div></div>';
           }
           document.getElementById("numberCardData").innerHTML += '<div style="margin: 16px;"><h1 class="side-number" style="margin-bottom: 0px;">' + Math.round(getStandAverage(standFields[i].id, team.team_number)) + '</h1><strong>' + standFields[i].title + '</strong><br><small class="text-muted">Average</small></div>'
         } else if (standFields[i].type == 'scale') {
-          if (document.getElementById('card-rating') == null) {
-            teamInfoColumns.innerHTML += '<div class="mdc-card" id="card-scale"><div class="mdc-card__primary-action noselect"  onclick="card.expand(this.parentElement, ' + team.team_number + ');" tabindex="0" style="padding: 16px;"><h5 style="margin-bottom: 0px;">Rating</h5><small class="text-muted" style="margin-bottom: 10px;">Click for Comments</small><h6 id="ratingCardData"></h6><i class="material-icons" style="position: absolute; right: 20px; top: 30%;">expand_more</i><div id="comments" class="text-muted"></div></div></div>';
+          if (document.getElementById('card-number') == null) {
+            teamInfoColumns.innerHTML += '<div class="mdc-card" id="card-number"><div class="mdc-card__primary-action noselect" tabindex="0" style="padding: 16px;"><h5 style="margin-bottom: 0px;">Numbers</h5><div class="data-card" id="numberCardData"></div></div></div>';
           }
-          var starsLeft = getStandAverage(standFields[i].id, team.team_number);
-          var iconsLeft = 5;
-          document.getElementById("ratingCardData").innerText = Math.floor(getStandAverage(standFields[i].id, team.team_number)) + "/" + standFields[i].max;
+          document.getElementById("numberCardData").innerHTML += '<div style="margin: 16px;"><h1 class="side-number" style="margin-bottom: 0px;">' + Math.round(getStandAverage(standFields[i].id, team.team_number)) + '/'+standFields[i].max+'</h1><strong>' + standFields[i].title + '</strong><br><small class="text-muted">Average</small></div>'
         } else if (standFields[i].type == 'dropdown') {
+          const dropi = i;
+          dropdownteam = team;
+          teamInfoColumns.innerHTML += '<div class="mdc-card" style="padding: 10px; padding-bottom: 20px"id="card-' + standFields[i].id + '"><canvas id="chart-' + standFields[i].id + '">Chart showing ' + standFields[i].title + ' data. Your browser does not support HTML canvas</canvas></div>';
+          const chartel = '#chart-' + standFields[i].id;
+          $(chartel).ready(function(){const team=dropdownteam;console.log(dropi);const ctx=document.getElementById('chart-'+standFields[dropi].id);const dropData=dropdown.getNumbers(standFields[dropi].id,team.team_number,matchData,dropi);new Chart(ctx,{type:'doughnut',data:{labels:standFields[dropi].options,datasets:[{data:dropData,backgroundColor:['rgba(255, 99, 132, 1)','rgba(54, 162, 235, 1)','rgba(255, 206, 86, 1)','rgba(75, 192, 192, 1)','rgba(153, 102, 255, 1)','rgba(255, 159, 64, 1)']}]},options:{maintainAspectRatio:true,responsive:true,aspectRatio:1,animation:{duration:0},hover:{animationDuration:0},responsiveAnimationDuration:0,title:{display:true,text:standFields[dropi].title,position:'top',padding:1}}});})
+        } else if (standFields[i].type == 'multi-select') {
           const dropi = i;
           dropdownteam = team;
           teamInfoColumns.innerHTML += '<div class="mdc-card" style="padding: 10px; padding-bottom: 20px"id="card-' + standFields[i].id + '"><canvas id="chart-' + standFields[i].id + '">Chart showing ' + standFields[i].title + ' data. Your browser does not support HTML canvas</canvas></div>';
@@ -305,49 +312,23 @@ const teamView = {
             const team = dropdownteam;
             console.log(dropi);
             const ctx = document.getElementById('chart-' + standFields[dropi].id);
-            const dropData = dropdown.getNumbers(standFields[dropi].id, team.team_number, matchData, dropi);
-            new Chart(ctx, {
-              type: 'doughnut',
-              data: {
-                labels: standFields[dropi].options,
-                datasets: [{
-                  data: dropData,
-                  backgroundColor: [
-                    'rgba(255, 99, 132, 1)',
-                    'rgba(54, 162, 235, 1)',
-                    'rgba(255, 206, 86, 1)',
-                    'rgba(75, 192, 192, 1)',
-                    'rgba(153, 102, 255, 1)',
-                    'rgba(255, 159, 64, 1)'
-                  ],
-                }]
-              },
-              options: {
-                maintainAspectRatio: true,
-                responsive: true,
-                aspectRatio: 1,
-                animation: {
-                  duration: 0
-                },
-                hover: {
-                  animationDuration: 0
-                },
-                responsiveAnimationDuration: 0,
-                title: {
-                  display: true,
-                  text: standFields[dropi].title,
-                  position: 'top',
-                  padding: 1
-                }
-              }
-            });
-
+            const multiData = getMultiSelectData(standFields[dropi], team.team_number, matchData);
+            new Chart(ctx,{type:'bar',data:{labels:standFields[dropi].options,datasets:[{data:multiData,backgroundColor:['rgba(255, 99, 132, 1)','rgba(54, 162, 235, 1)','rgba(255, 206, 86, 1)','rgba(75, 192, 192, 1)','rgba(153, 102, 255, 1)','rgba(255, 159, 64, 1)']}]},options:{maintainAspectRatio:true,responsive:true,aspectRatio:1,animation:{duration:0},hover:{animationDuration:0},responsiveAnimationDuration:0,title:{display:true,text:standFields[dropi].title+" (%)",position:'top',padding:1},scales:{yAxes:[{ticks:{beginAtZero:true}}]},legend:{display:false}}});
           })
+        }else if (standFields[i].type == 'text') {
+          if (document.getElementById('card-'+standFields[i].id) == null) {
+            teamInfoColumns.innerHTML += '<div class="mdc-card" id="card-'+standFields[i].id+'"><div class="mdc-card__primary-action noselect" tabindex="0" style="padding: 16px;"><h5 style="margin-bottom: 0px;">'+standFields[i].title+'</h5><ul id="'+standFields[i].id+'CardData"></ul></div></div>';
+          }
+          for(var match of matchData["team" + team.team_number]){
+            var listItem = document.createElement("li");
+            listItem.innerText = "\"" + match[standFields[i].id] + "\"";
+            document.getElementById(standFields[i].id + "CardData").appendChild(listItem);
+          }
         }
 
       }
     }
-    if (pitData != null && typeof pitData['team' + team.team_number] != 'undefined') { //checks if pit scouting is completed
+    if (pitData != null && typeof pitData['team' + team.team_number] != 'undefined') {
       teamInfoColumns.innerHTML += '<div class="mdc-card" id="card-pitscout"><div class="noselect"><h5 style="margin: 16px; margin-bottom: 0px">Pit Scouting</h5><ul class="mdc-list mdc-list--two-line" id="pitList"></ul></div></div>'
       var pitList = document.getElementById('pitList')
       const iconNames = {
@@ -358,15 +339,22 @@ const teamView = {
         'text': 'chat',
         'dropdown': 'list',
         'scale': 'linear_scale',
-        'number': 'dialpad'
+        'number': 'dialpad',
+        'multiSelect': 'done_all'
       }
       for (var field of pitFields) {
         if (field.type == 'checkbox') {
-          pitList.innerHTML += '<li class="mdc-list-item" tabindex="0"> <span class="mdc-list-item__ripple"></span> <span class="mdc-list-item__graphic material-icons">' + iconNames.checkbox[pitData['team' + team.team_number][field.id]] + '</span> <span class="mdc-list-item__text"> <span class="mdc-list-item__text">' + field.title + '</span> </span></li>';
+          pitList.innerHTML += '<li class="mdc-list-item pit-list-item" tabindex="0"> <span class="mdc-list-item__ripple"></span> <span class="mdc-list-item__graphic material-icons">' + iconNames.checkbox[pitData['team' + team.team_number][field.id]] + '</span> <span class="mdc-list-item__text"> <span class="mdc-list-item__text">' + field.title + '</span> </span></li>';
         }else if(field.type == "dropdown"){
-          pitList.innerHTML += '<li class="mdc-list-item" tabindex="0"> <span class="mdc-list-item__ripple"></span> <span class="mdc-list-item__graphic material-icons">' + iconNames.dropdown + '</span> <span class="mdc-list-item__text"> <span class="mdc-list-item__primary-text">' + field.title + '</span><span class="mdc-list-item__secondary-text">' + field.options[pitData['team' + team.team_number][field.id]] + '</span></span></li>';
+          pitList.innerHTML += '<li class="mdc-list-item pit-list-item" tabindex="0"> <span class="mdc-list-item__ripple"></span> <span class="mdc-list-item__graphic material-icons">' + iconNames.dropdown + '</span> <span class="mdc-list-item__text"> <span class="mdc-list-item__primary-text">' + field.title + '</span><span class="mdc-list-item__secondary-text">' + field.options[pitData['team' + team.team_number][field.id]] + '</span></span></li>';
+        }else if(field.type == "multi-select"){
+          var selectedText = [];
+          for(var response of pitData['team' + team.team_number][field.id]){
+            selectedText.push(field.options[response]);
+          }
+          pitList.innerHTML += '<li class="mdc-list-item pit-list-item" tabindex="0"> <span class="mdc-list-item__ripple"></span> <span class="mdc-list-item__graphic material-icons">' + iconNames.multiSelect + '</span> <span class="mdc-list-item__text"> <span class="mdc-list-item__primary-text">' + field.title + '</span><span class="mdc-list-item__secondary-text">' + selectedText.join(", ") + '</span></span></li>';
         }else{
-          pitList.innerHTML += '<li class="mdc-list-item" tabindex="0"> <span class="mdc-list-item__ripple"></span> <span class="mdc-list-item__graphic material-icons">' + iconNames[field.type] + '</span> <span class="mdc-list-item__text"> <span class="mdc-list-item__primary-text">' + field.title + '</span> <span class="mdc-list-item__secondary-text">' + pitData['team' + team.team_number][field.id] + '</span> </span></li>';
+          pitList.innerHTML += '<li class="mdc-list-item pit-list-item" tabindex="0" onclick="this.querySelector(\'\'"> <span class="mdc-list-item__ripple"></span> <span class="mdc-list-item__graphic material-icons">' + iconNames[field.type] + '</span> <span class="mdc-list-item__text"> <span class="mdc-list-item__primary-text">' + field.title + '</span> <span class="mdc-list-item__secondary-text">' + pitData['team' + team.team_number][field.id] + '</span> </span></li>';
         }
       }
     }
@@ -377,17 +365,30 @@ const teamView = {
   }
 };
 
+function getMultiSelectData(field, team, dataset){
+  var data = [];
+  for(var i = 0; i < field.options.length; i++){
+    var numChecked = 0;
+    for(var match of dataset["team" + team]){
+      if(match[field.id].indexOf(i) != -1){
+        numChecked++;
+      }
+    }
+    data.push((numChecked / dataset["team" + team].length) * 100);
+  }
+  return data;
+}
+
 const checkboxes = {
-  "allDone": function (id, number, type) {
-    if (typeof standData != "undefined" && typeof standData['team' + number] != 'undefined') {
-      var object = data.rows[getDbByID(data.rows, 'team' + number)].doc[type];
+  "allDone": function (id, number) {
+    if (typeof matchData != "undefined" && typeof matchData['team' + number] != 'undefined') {
+      var object = matchData["team"+number];
     }
     if (typeof object != 'undefined') {
-      var keys = Object.keys(object)
       var done = false;
       var allDone = true;
-      for (var i = 0; i < keys.length; i++) {
-        if (standData['team' + number][keys[i]]) {
+      for (var i = 0; i < object.length; i++) {
+        if (object[i][id]) {
           done = true;
         } else {
           allDone = false;
@@ -439,27 +440,6 @@ const dropdown = {
   }
 }
 
-const card = {
-  "expand": function (element, team) {
-    $header = $(element);
-    //getting the next element
-    document.getElementById('comments').innerHTML = '<li role="separator" class="mdc-list-divider"></li><small style="color:var(--mdc-theme-text-primary-on-background, black)">Comments<br></small>';
-    var object = matchData['team' + team];
-    for (var match of object) {
-      if (match.comment != undefined || match.comment != ""){
-        var comment = document.createElement("li");
-        comment.innerText = "\"" + match.comment + "\"";
-        document.getElementById('comments').appendChild(comment);
-      }
-    }
-    $("#comments").slideToggle(200, function () {
-      //execute this after slideToggle is done
-      //change text of header based on visibility of content div
-    });
-
-
-  }
-}
 function favoriteTeam(team) {
   var favoriteTeams = JSON.parse(localStorage.getItem('favoriteTeams'))
   if (favoriteTeams == null) {
@@ -640,7 +620,15 @@ async function compileData(files){
           matchData[key] = [];
         }
         for(var match of obj[key]){
-          matchData[key].push(match);
+          var isDuplicate = matchData[key].includes(match);
+          for(var allMatch of matchData[key]){
+            if(JSON.stringify(allMatch) == JSON.stringify(match)){
+              isDuplicate = true;
+            }
+          }
+          if(!isDuplicate){
+            matchData[key].push(match);
+          }
         }
       }
     }
@@ -655,4 +643,23 @@ async function compileData(files){
     snackbar.labelText = "An error occured while importing files.";
     snackbar.open();
   }
+}
+var downloader = document.createElement("a")
+function consolidateData(){
+    try{
+        var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(matchData));
+        downloader.setAttribute("href",     dataStr);
+        downloader.setAttribute("download", "match-scouting.json");
+        downloader.click();
+        dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(pitData));
+        downloader.setAttribute("href",     dataStr);
+        downloader.setAttribute("download", "pit-scouting.json");
+        downloader.click();
+    }catch(err){
+        snackbar.labelText = "There was an error downloading data";
+        snackbar.open();
+    }finally{
+        snackbar.labelText = "Scouting data exported";
+        snackbar.open();
+    }
 }
