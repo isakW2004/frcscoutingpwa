@@ -36,7 +36,7 @@ function fetchTeams() {
         url: "https://www.thebluealliance.com/api/v3/event/" + localStorage.getItem("currentEvent") + "/teams/simple",
         type: "GET",
         dataType: "json",
-        beforeSend: function (xhr) { xhr.setRequestHeader('X-TBA-Auth-Key', 'KYyfzxvdzhHGSE6ENeT6H7sxMJsO7Gzp0BMEi7AE3nTR7pHSsmKOSKAblMInnSfw '); },
+        beforeSend: function (xhr) { xhr.setRequestHeader('X-TBA-Auth-Key', TBA_AUTH); },
         success: function (contents) {
             document.getElementById("fetch-button").disabled = 'true';
             document.getElementById("fetch-label").innerHTML = 'Fetched';
@@ -107,7 +107,7 @@ async function fetchMatchesAjax(team, matches) {
             url: "https://www.thebluealliance.com/api/v3/team/" + team.key + "/event/" + localStorage.getItem("currentEvent") + "/matches/simple",
             type: "GET",
             dataType: "json",
-            beforeSend: function (xhr) { xhr.setRequestHeader('X-TBA-Auth-Key', 'KYyfzxvdzhHGSE6ENeT6H7sxMJsO7Gzp0BMEi7AE3nTR7pHSsmKOSKAblMInnSfw '); },
+            beforeSend: function (xhr) { xhr.setRequestHeader('X-TBA-Auth-Key', TBA_AUTH); },
             success: function (contents) {
                 for (var match of contents) {
                     if (match.comp_level === "qm") {
@@ -659,7 +659,6 @@ function qrShare(){
             radioButton.innerHTML = "<input class=mdc-radio__native-control name=radios data-value="+key.split("team")[1]+" type=radio><div class=mdc-radio__background><div class=mdc-radio__outer-circle></div><div class=mdc-radio__inner-circle></div></div><div class=mdc-radio__ripple></div>";
             listItem.appendChild(radioButton);
             var label = document.createElement('label');
-            label.classList.add("mdc-radio");
             label.innerText = "Team " + key.split("team")[1];
             listItem.appendChild(label);
             teamList.appendChild(listItem);
@@ -784,11 +783,11 @@ function downloadData(el){
     try{
         var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(localStorage.getItem("matchData"));
         downloader.setAttribute("href",     dataStr);
-        downloader.setAttribute("download", "match-scouting.json");
+        downloader.setAttribute("download", "match-scouting-"+(new Date).getTime()+".json");
         downloader.click();
         dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(localStorage.getItem("pitData"));
         downloader.setAttribute("href",     dataStr);
-        downloader.setAttribute("download", "pit-scouting.json");
+        downloader.setAttribute("download", "pit-scouting-"+(new Date).getTime()+".json");
         downloader.click();
     }catch(err){
         snackbar.labelText = "There was an error downloading data";
@@ -802,10 +801,10 @@ function downloadData(el){
 function nativeShare(){
     var files = [];
     if(localStorage.getItem("matchData") != null){
-        files.push(new File([localStorage.getItem("matchData")], "matchData.json", {type:"application/json"}));
+        files.push(new File([localStorage.getItem("matchData")], "match-data"+(new Date).getTime()+".json", {type:"application/json"}));
     }
     if(localStorage.getItem("pitData") != null){
-        files.push(new File([localStorage.getItem("pitData")], "pitData.json", {type:"application/json"}));
+        files.push(new File([localStorage.getItem("pitData")], "pit-data"+(new Date).getTime()+".json", {type:"application/json"}));
     }
     var data = {files:files, title:"Scouting Data", text:"Here's some cool scouting data"};
     if(navigator.canShare(data)){

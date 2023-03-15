@@ -4,12 +4,13 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <link rel="manifest" href="manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="2530 Events">
-  <meta name="theme-color" content="#7DC834" />
+  <meta name="apple-mobile-web-app-title" content="Swerve">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#232323" />
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#7DC834" />
   <link rel="apple-touch-icon" href="assets/images/icon-512-mask.png">
   <title>Welcome - 2530 Scouting</title>
   <link rel="stylesheet" href="assets/bootstrapcustom.min.css">
@@ -60,7 +61,7 @@
             <i class="material-icons mdc-list-item__graphic" aria-hidden="true">system_update_alt</i>
             <span class="mdc-list-item__text drawer_text">Force Update</span>
           </span>
-          <h6 class="mdc-list-group__subheader">FRC Team 2530</h6>
+          <small class="mdc-list-group__subheader text-muted">Made by Team 2530</small>
         </nav>
         </nav>
       </div>
@@ -88,7 +89,8 @@
               <div class="mdc-menu mdc-menu-surface" id="totallyNotAShareMenuAdblockerDoNotBlockMePlease">
                 <ul class="mdc-deprecated-list  mdc-deprecated-list--icon-list" role="menu" aria-hidden="true"
                   aria-orientation="vertical" tabindex="-1">
-                  <li class="mdc-deprecated-list-item hidden" id="notAShareButton" role="menuitem" onclick="nativeShare()">
+                  <li class="mdc-deprecated-list-item hidden" id="notAShareButton" role="menuitem"
+                    onclick="nativeShare()">
                     <span class="mdc-list-item__ripple"></span>
                     <span class="mdc-list-item__icon material-icons">share</span>
                     <span class="mdc-list-item__text">Share</span>
@@ -132,11 +134,10 @@
   <div class="mdc-dialog__container">
     <div class="mdc-dialog__surface" role="alertdialog" aria-modal="true" aria-labelledby="my-dialog-title"
       aria-describedby="my-dialog-content">
-      <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
-      <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
-     -->Choose an Event<br>
-        <small class="text-muted text-center">Changing events will delete unsaved data. <a onclick="localStorage.clear();localStorage.setItem('currentEvent', window.prompt('Event Code'));window.location.reload();">Custom Event</a></small><!--
-   -->
+      <h2 class="mdc-dialog__title" id="my-dialog-title">Choose an Event<br>
+        <small class="text-muted text-center">Changing events will delete unsaved data. <a
+            onclick="localStorage.clear();localStorage.setItem('currentEvent', window.prompt('Event Code'));window.location.reload();">Custom
+            Event</a></small>
       </h2>
       <div class="mdc-dialog__content" id="my-dialog-content">
         <ul class="mdc-list" id="eventlist">
@@ -295,7 +296,8 @@
             <span class="material-icons mdc-button__icon">add</span>
             <span class="mdc-button__label">Add Team</span>
           </button>
-          <button type="button" id="saveButton" class="mdc-button mdc-dialog__button mdc-button--raised" data-mdc-dialog-action="ok" data-mdc-dialog-button-default>
+          <button type="button" id="saveButton" class="mdc-button mdc-dialog__button mdc-button--raised"
+            data-mdc-dialog-action="ok" data-mdc-dialog-button-default>
             <div class="mdc-button__ripple"></div>
             <span class="material-icons mdc-button__icon">save</span>
             <span class="mdc-button__label">Save</span>
@@ -321,13 +323,10 @@
             <div id="qrTeamOptions"></div>
             <h6>Range:</h6>
             <div class="mdc-checkbox">
-              <input type="checkbox" class="mdc-checkbox__native-control" id="autoQr" checked/>
+              <input type="checkbox" class="mdc-checkbox__native-control" id="autoQr" checked />
               <div class="mdc-checkbox__background">
-                <svg class="mdc-checkbox__checkmark"
-                     viewBox="0 0 24 24">
-                  <path class="mdc-checkbox__checkmark-path"
-                        fill="none"
-                        d="M1.73,12.91 8.1,19.28 22.79,4.59"/>
+                <svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24">
+                  <path class="mdc-checkbox__checkmark-path" fill="none" d="M1.73,12.91 8.1,19.28 22.79,4.59" />
                 </svg>
                 <div class="mdc-checkbox__mixemark"></div>
               </div>
@@ -336,21 +335,21 @@
 
             <label for="autoQr">Everthing since last scan</label>
             <div>
-            <label class="mdc-text-field mdc-text-field--outlined" id="customRange" hidden>
-              <span class="mdc-notched-outline">
-                <span class="mdc-notched-outline__leading"></span>
-                <span class="mdc-notched-outline__notch">
-                  <span class="mdc-floating-label">Range To Skip</span>
+              <label class="mdc-text-field mdc-text-field--outlined" id="customRange" hidden>
+                <span class="mdc-notched-outline">
+                  <span class="mdc-notched-outline__leading"></span>
+                  <span class="mdc-notched-outline__notch">
+                    <span class="mdc-floating-label">Range To Skip</span>
+                  </span>
+                  <span class="mdc-notched-outline__trailing"></span>
                 </span>
-                <span class="mdc-notched-outline__trailing"></span>
-              </span>
-              <input type="text" class="mdc-text-field__input" aria-labelledby="my-label-id">
-            </label>
-          </div>
+                <input type="text" class="mdc-text-field__input" aria-labelledby="my-label-id">
+              </label>
+            </div>
           </div>
         </div>
         <div class="mdc-dialog__actions" onclick="addToScanned()">
-          <button type="button" class="mdc-button mdc-dialog__button">
+          <button type="button" class="mdc-button mdc-dialog__button mdc-button--raised">
             <div class="mdc-button__ripple"></div>
             <span class="material-icons mdc-button__icon">check</span>
             <span class="mdc-button__label">Scanned</span>
@@ -372,7 +371,7 @@
     const shareMenu = new mdc.menu.MDCMenu(document.getElementById("totallyNotAShareMenuAdblockerDoNotBlockMePlease"));
     const qrDialog = new mdc.dialog.MDCDialog(document.getElementById('qrDialog'));
     const customRangeText = new mdc.textField.MDCTextField(document.getElementById("customRange"))
-    if(navigator.share && navigator.canShare){
+    if (navigator.share && navigator.canShare) {
       document.getElementById("notAShareButton").classList.remove("hidden");
     }
   </script>

@@ -8,7 +8,6 @@ var urlsToCache = [
   'assets/style.css',
   'index.html',
   'scout.html',
-  'assets/images/teamphoto.jpg',
   'assets/charts.js',
   'assets/genQRCode.js',
   'assets/qrreader/alignpat.js',
@@ -28,6 +27,7 @@ var urlsToCache = [
   'assets/qrreader/qrcode.js',
   'assets/qrreader/rsdecoder.js',
   'assets/qrreader/version.js',
+  'assets/jquery.tablesorter.js'
 ];
 
 self.addEventListener('install', function(event) {

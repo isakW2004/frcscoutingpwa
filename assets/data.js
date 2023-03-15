@@ -6,7 +6,7 @@ if (allTeams == null) {
       url: "https://www.thebluealliance.com/api/v3/event/" + localStorage.getItem("currentEvent") + "/teams/simple",
       type: "GET",
       dataType: "json",
-      beforeSend: function (xhr) { xhr.setRequestHeader('X-TBA-Auth-Key', 'KYyfzxvdzhHGSE6ENeT6H7sxMJsO7Gzp0BMEi7AE3nTR7pHSsmKOSKAblMInnSfw '); },
+      beforeSend: function (xhr) { xhr.setRequestHeader('X-TBA-Auth-Key', TBA_AUTH); },
       success: function (contents) {
         localStorage.setItem('allTeams', JSON.stringify(contents))
         allTeams = contents
@@ -36,6 +36,8 @@ Math.avg = function (array) {
 
 function showData() {
   document.getElementById('tableContainer').hidden = false;
+  document.getElementById('tuneButton').hidden = false;
+  document.getElementById('consolidateButton').hidden = false;
   document.getElementById('main-tab').hidden = true;
   var tableBody = document.getElementById('tableBody');
   var tableHead = document.getElementById('header-row');
@@ -46,7 +48,7 @@ function showData() {
   }
   for (var team of allTeams) {
     if (typeof matchData["team"+team.team_number] != "undefined" || typeof pitData["team"+team.team_number] != "undefined") {
-      tableBody.innerHTML += '<tr class="mdc-data-table__row" tabindex="5" onclick="teamView.show('+team.team_number+')"id=' + team.team_number + 'row ><td class="mdc-data-table__cell">' + tableFavorite(team.team_number) + team.team_number + ' ' + team.nickname + '</td>';
+      tableBody.innerHTML += '<tr class="mdc-data-table__row" tabindex="5" onclick="teamView.show('+team.team_number+')"id=' + team.team_number + 'row  data-team='+team.team_number+'><td class="mdc-data-table__cell">' + tableFavorite(team.team_number) + team.team_number + ' ' + team.nickname + '</td>';
       for (var field of standFields) {
           if (field.type == 'number' || field.type == "scale") {
             document.getElementById(team.team_number + 'row').innerHTML += '<td class="mdc-data-table__cell mdc-data-table__cell--numeric">' + getStandAverage(field.id, team.team_number) + '</td>';
@@ -58,8 +60,9 @@ function showData() {
       skippedTeams.push(team.team_number + ' ' + team.nickname)
     }
   }
+  $("table").tablesorter({sortList:[1,0], pointerClick :""}); 
   document.addEventListener("MDCDataTable:sorted", function (detail) {
-    sortTable(detail.detail.columnIndex, detail.detail.sortValue)
+    $("table").find("th:eq("+detail.detail.columnIndex+")").trigger("sort");
   })
 }
 
@@ -184,38 +187,6 @@ const pitFields = [
   },
 ]
 
-function sortTable(n, dir) {
-  var table, rows, switching, i, x, y, shouldSwitch, switchcount = 0;
-  table = dataTable;
-  switching = true;
-  while (switching) {
-    switching = false;
-    rows = table.getRows();
-    for (i = 0; i < (rows.length - 1); i++) {
-      shouldSwitch = false;
-      x = rows[i].getElementsByTagName("TD")[n];
-      y = rows[i + 1].getElementsByTagName("TD")[n];
-      if (dir == "ascending") {
-        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
-          shouldSwitch = true;
-          break;
-        }
-      } else if (dir == "descending") {
-        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
-          shouldSwitch = true;
-          break;
-        }
-      }
-    }
-    if (shouldSwitch) {
-      rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-      switching = true;
-      switchcount++;
-    }
-  }
-}
-
-
 function getStandAverage(id, number) {
   try {
     var matches = matchData['team' + number];
@@ -231,7 +202,7 @@ function getStandAverage(id, number) {
     if(matches.length - nonAnsers == 0){
       return "-";
     }
-    return sum / (matches.length - nonAnsers);
+    return Math.floor(sum / (matches.length - nonAnsers) * 100) / 100;
   } catch {
     return "-";
   }
@@ -245,6 +216,8 @@ const teamView = {
     button.hidden = false;
     document.getElementById('favoriteButton').hidden = true;
     document.getElementById('eventButton').hidden = false;
+    document.getElementById('tuneButton').hidden = false;
+    document.getElementById('consolidateButton').hidden = false;
     document.getElementById('tableContainer').classList.remove('disappearing')
     document.getElementById("backButton").hidden = true
     document.getElementById('tableContainer').hidden = false;
@@ -265,7 +238,9 @@ const teamView = {
     title.innerHTML = "Team " + team.team_number + " " + team.nickname;
     button.hidden = true;
     document.getElementById("backButton").hidden = false
+    document.getElementById('consolidateButton').hidden = true;
     document.getElementById('favoriteButton').hidden = false;
+    document.getElementById('tuneButton').hidden = true;
     document.getElementById('eventButton').hidden = true;
     document.getElementById('favoriteButton').onclick = function () { favoriteTeam(team.team_number) };
     if (localStorage.getItem('favoriteTeams') != null) {
@@ -302,7 +277,7 @@ const teamView = {
           dropdownteam = team;
           teamInfoColumns.innerHTML += '<div class="mdc-card" style="padding: 10px; padding-bottom: 20px"id="card-' + standFields[i].id + '"><canvas id="chart-' + standFields[i].id + '">Chart showing ' + standFields[i].title + ' data. Your browser does not support HTML canvas</canvas></div>';
           const chartel = '#chart-' + standFields[i].id;
-          $(chartel).ready(function(){const team=dropdownteam;console.log(dropi);const ctx=document.getElementById('chart-'+standFields[dropi].id);const dropData=dropdown.getNumbers(standFields[dropi].id,team.team_number,matchData,dropi);new Chart(ctx,{type:'doughnut',data:{labels:standFields[dropi].options,datasets:[{data:dropData,backgroundColor:['rgba(255, 99, 132, 1)','rgba(54, 162, 235, 1)','rgba(255, 206, 86, 1)','rgba(75, 192, 192, 1)','rgba(153, 102, 255, 1)','rgba(255, 159, 64, 1)']}]},options:{maintainAspectRatio:true,responsive:true,aspectRatio:1,animation:{duration:0},hover:{animationDuration:0},responsiveAnimationDuration:0,title:{display:true,text:standFields[dropi].title,position:'top',padding:1}}});})
+          $(chartel).ready(function(){const team=dropdownteam;const ctx=document.getElementById('chart-'+standFields[dropi].id);const dropData=dropdown.getNumbers(standFields[dropi].id,team.team_number,matchData,dropi);new Chart(ctx,{type:'doughnut',data:{labels:standFields[dropi].options,datasets:[{data:dropData,backgroundColor:['rgba(255, 99, 132, 1)','rgba(54, 162, 235, 1)','rgba(255, 206, 86, 1)','rgba(75, 192, 192, 1)','rgba(153, 102, 255, 1)','rgba(255, 159, 64, 1)']}]},options:{maintainAspectRatio:true,responsive:true,aspectRatio:1,animation:{duration:0},hover:{animationDuration:0},responsiveAnimationDuration:0,title:{display:true,text:standFields[dropi].title,position:'top',padding:1}}});})
         } else if (standFields[i].type == 'multi-select') {
           const dropi = i;
           dropdownteam = team;
@@ -310,19 +285,20 @@ const teamView = {
           const chartel = '#chart-' + standFields[i].id;
           $(chartel).ready(function () {
             const team = dropdownteam;
-            console.log(dropi);
             const ctx = document.getElementById('chart-' + standFields[dropi].id);
             const multiData = getMultiSelectData(standFields[dropi], team.team_number, matchData);
-            new Chart(ctx,{type:'bar',data:{labels:standFields[dropi].options,datasets:[{data:multiData,backgroundColor:['rgba(255, 99, 132, 1)','rgba(54, 162, 235, 1)','rgba(255, 206, 86, 1)','rgba(75, 192, 192, 1)','rgba(153, 102, 255, 1)','rgba(255, 159, 64, 1)']}]},options:{maintainAspectRatio:true,responsive:true,aspectRatio:1,animation:{duration:0},hover:{animationDuration:0},responsiveAnimationDuration:0,title:{display:true,text:standFields[dropi].title+" (%)",position:'top',padding:1},scales:{yAxes:[{ticks:{beginAtZero:true}}]},legend:{display:false}}});
+            new Chart(ctx,{type:'bar',data:{labels:standFields[dropi].options,datasets:[{data:multiData,backgroundColor:['rgba(255, 99, 132, 1)','rgba(54, 162, 235, 1)','rgba(255, 206, 86, 1)','rgba(75, 192, 192, 1)','rgba(153, 102, 255, 1)','rgba(255, 159, 64, 1)']}]},options:{maintainAspectRatio:true,responsive:true,aspectRatio:1,animation:{duration:0},hover:{animationDuration:0},responsiveAnimationDuration:0,title:{display:true,text:standFields[dropi].title+" (%)",position:'top',padding:1},scales:{yAxes:[{ticks:{beginAtZero:true, max:100}}]},legend:{display:false}}});
           })
         }else if (standFields[i].type == 'text') {
           if (document.getElementById('card-'+standFields[i].id) == null) {
             teamInfoColumns.innerHTML += '<div class="mdc-card" id="card-'+standFields[i].id+'"><div class="mdc-card__primary-action noselect" tabindex="0" style="padding: 16px;"><h5 style="margin-bottom: 0px;">'+standFields[i].title+'</h5><ul id="'+standFields[i].id+'CardData"></ul></div></div>';
           }
           for(var match of matchData["team" + team.team_number]){
-            var listItem = document.createElement("li");
-            listItem.innerText = "\"" + match[standFields[i].id] + "\"";
-            document.getElementById(standFields[i].id + "CardData").appendChild(listItem);
+            if(match[standFields[i].id] != ""){
+              var listItem = document.createElement("li");
+              listItem.innerText = "\"" + match[standFields[i].id] + "\"";
+              document.getElementById(standFields[i].id + "CardData").appendChild(listItem);
+            }
           }
         }
 
@@ -357,6 +333,21 @@ const teamView = {
           pitList.innerHTML += '<li class="mdc-list-item pit-list-item" tabindex="0" onclick="this.querySelector(\'\'"> <span class="mdc-list-item__ripple"></span> <span class="mdc-list-item__graphic material-icons">' + iconNames[field.type] + '</span> <span class="mdc-list-item__text"> <span class="mdc-list-item__primary-text">' + field.title + '</span> <span class="mdc-list-item__secondary-text">' + pitData['team' + team.team_number][field.id] + '</span> </span></li>';
         }
       }
+    }
+    if(typeof blueAllianceStats != "undefined"){
+      var tbaCard = document.createElement("div");
+      tbaCard.classList.value = "mdc-card blue-alliance-text";
+      tbaCard.innerHTML = '<h5 style="margin: 16px; margin-bottom: 0px">Blue Alliance Stats</h5>';
+      var list = document.createElement("ul");
+      list.classList.value = "mdc-list mdc-list--two-line";
+      for(var stat of blueAllianceStats["frc" + team.team_number]){
+        var listItem = document.createElement("li");
+        listItem.classList.value = "mdc-list-item";
+        listItem.innerHTML = '<span class="mdc-list-item__ripple"></span> <span class="mdc-list-item__text"> <span class="mdc-list-item__primary-text">' + stat.name + '</span><span class="mdc-list-item__secondary-text">' + stat.value + (stat.name != "Overall Rank" ?  ' (Rank '+ stat.rank +')' : '') +'</span></span>';
+        list.appendChild(listItem);
+      }
+      tbaCard.appendChild(list);
+      teamInfoColumns.appendChild(tbaCard);
     }
     var selector = '.mdc-button, .mdc-icon-button, .mdc-card__primary-action, .mdc-list-item';
     var ripples = [].map.call(document.querySelectorAll(selector), function (el) {
@@ -520,7 +511,6 @@ function qrCodeDetected(text) {
       } else {
         for (var key of Object.keys(data)) {
           var listItem = document.createElement("li");
-          console.log(key);
           if (key == "type") {
             listItem.innerText = "Contains " + data[key] + " data.";
           } else {
@@ -603,10 +593,8 @@ async function compileData(files){
   try{
     var i = 0;
     for await(const file of files){
-      console.log(files);
       if(file.type == "application/json"){
         if(file.name.search("match") != -1){
-          console.log(file.text());
           matchFileObjs.push(JSON.parse(await file.text()));
         }else{
           pitFileObjs.push(JSON.parse(await file.text()));
@@ -662,4 +650,173 @@ function consolidateData(){
         snackbar.labelText = "Scouting data exported";
         snackbar.open();
     }
+}
+
+var blueAllianceStats;
+
+async function getBlueAllianceStats(){
+  await $.ajax({
+      url: "https://www.thebluealliance.com/api/v3/event/" + localStorage.getItem("currentEvent") + "/teams/statuses",
+      type: "GET",
+      dataType: "json",
+      beforeSend: function(xhr){xhr.setRequestHeader('X-TBA-Auth-Key', TBA_AUTH);},
+      success: function(data) { 
+        blueAllianceStats = new Object;
+        for(var key of Object.keys(data)){
+          blueAllianceStats[key] = [];
+          for(var i = 0; i < data[key].qual.sort_order_info.length; i++){
+            var stat = new Object;
+            stat.value = data[key].qual.ranking.sort_orders[i];
+            stat.name = data[key].qual.sort_order_info[i].name;
+            blueAllianceStats[key].push(stat);
+          }
+          var rank = new Object;
+          rank.value = data[key].qual.ranking.rank
+          rank.name = "Overall Rank";
+          blueAllianceStats[key].push(rank);
+        }
+      },
+   });
+  await $.ajax({
+    url: "https://www.thebluealliance.com/api/v3/event/" + localStorage.getItem("currentEvent") + "/oprs",
+    type: "GET",
+    dataType: "json",
+    beforeSend: function(xhr){xhr.setRequestHeader('X-TBA-Auth-Key', TBA_AUTH);},
+    success: function(data) { 
+      for(var key of Object.keys(data.ccwms)){
+        blueAllianceStats[key].push({name:"CCWM", value:data.ccwms[key]});
+      }
+      for(var key of Object.keys(data.oprs)){
+        blueAllianceStats[key].push({name:"OPR", value:data.oprs[key]});
+      }
+      for(var key of Object.keys(data.dprs)){
+        blueAllianceStats[key].push({name:"DPR", value:data.dprs[key]});
+      }
+    }
+ });
+ var rankedStats = [];
+ for(var key of Object.keys(blueAllianceStats)){
+  if(rankedStats.length < blueAllianceStats[key].length){
+    for(var i = 0; i < blueAllianceStats[key].length; i++){
+      rankedStats.push([]);
+    }
+  }
+  for(var i = 0; i < blueAllianceStats[key].length; i++){
+    rankedStats[i].push(blueAllianceStats[key][i].value);
+  }
+ }
+ for(var i = 0; i < rankedStats.length; i++){
+  rankedStats[i] = rankedStats[i].sort(function(a, b) {
+    return a - b;
+  }).reverse();
+ }
+ for(var key of Object.keys(blueAllianceStats)){
+  for(var i = 0; i < blueAllianceStats[key].length; i++){
+    blueAllianceStats[key][i].rank = rankedStats[i].indexOf(blueAllianceStats[key][i].value) + 1;
+  }
+ }
+}
+
+function updateTable(valueIndexes, rankIndexes){
+  var table = document.querySelector("table");
+  table.querySelectorAll(".blue-alliance-text").forEach(function(el){
+    el.remove();
+  });
+  for(var row of table.rows){
+    if(row.id == "header-row"){
+      for(var dataIndex of valueIndexes){
+        var headerName = blueAllianceStats[Object.keys(blueAllianceStats)[0]][dataIndex].name;
+        var cell = document.createElement("th");
+        cell.classList.value = "mdc-data-table__header-cell mdc-data-table__header-cell--numeric mdc-data-table__header-cell--with-sort blue-alliance-text";
+        cell.innerHTML = '<div class="tablesorter-header-inner"><div class="mdc-data-table__header-cell-wrapper"><button class="mdc-icon-button material-icons mdc-data-table__sort-icon-button" aria-label=Sort by"'+headerName+'">arrow_upward</button><div class="mdc-data-table__header-cell-label">'+headerName+'</div><div class="mdc-data-table__sort-status-label" aria-hidden="true"></div></div></div>';
+        row.appendChild(cell);
+      }
+      for(var dataIndex of rankIndexes){
+        var headerName = blueAllianceStats[Object.keys(blueAllianceStats)[0]][dataIndex].name + " Rank";
+        var cell = document.createElement("th");
+        cell.classList.value = "mdc-data-table__header-cell mdc-data-table__header-cell--numeric mdc-data-table__header-cell--with-sort blue-alliance-text";
+        cell.innerHTML = '<div class="tablesorter-header-inner"><div class="mdc-data-table__header-cell-wrapper"><button class="mdc-icon-button material-icons mdc-data-table__sort-icon-button" aria-label=Sort by"'+headerName+'">arrow_upward</button><div class="mdc-data-table__header-cell-label">'+headerName+'</div><div class="mdc-data-table__sort-status-label" aria-hidden="true"></div></div></div>';
+        row.appendChild(cell);
+      }
+    }else{
+      var team = row.dataset.team;
+      for(var dataIndex of valueIndexes){
+        var cell = document.createElement("td");
+        cell.classList.value = "mdc-data-table__cell mdc-data-table__cell--numeric blue-alliance-text";
+        cell.innerText = Math.floor(blueAllianceStats["frc" + team][dataIndex].value * 100) / 100;
+        row.appendChild(cell);
+      }
+      for(var dataIndex of rankIndexes){
+        var cell = document.createElement("td");
+        cell.classList.value = "mdc-data-table__cell mdc-data-table__cell--numeric blue-alliance-text";
+        cell.innerText = blueAllianceStats["frc" + team][dataIndex].rank;
+        row.appendChild(cell);
+      }
+    }
+  }
+  $("table").trigger("updateAll", [true]);
+}
+
+var fieldsToShow = [];
+var ranksToShow = [];
+
+function tbaDialogInitialize(){
+  snackbar.labelText= "Getting Data. This may take a moment.";
+  snackbar.open();
+  getBlueAllianceStats().then(function(){
+    var fieldList = document.getElementById("tuneList");
+    var i = 0;
+    for(var field of blueAllianceStats[Object.keys(blueAllianceStats)[0]]){
+      var listItem = document.createElement("ul");
+      var checkbox = document.createElement("div");
+      listItem.classList.add("mdc-list-item");
+      checkbox.classList.add("mdc-checkbox");
+      checkbox.innerHTML = '<input type="checkbox" class="mdc-checkbox__native-control" data-rank=false data-value='+i+'><div class="mdc-checkbox__background"><svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24"><path class="mdc-checkbox__checkmark-path" fill="none" d="M1.73,12.91 8.1,19.28 22.79,4.59"/></svg><div class="mdc-checkbox__mixedmark"></div></div><div class="mdc-checkbox__ripple"></div>';
+      listItem.appendChild(checkbox);
+      var label = document.createElement('label');
+      label.classList.add("mdc-list-item__text")
+      label.innerText = field.name;
+      listItem.appendChild(label);
+      fieldList.appendChild(listItem);
+      i++;
+    }
+    i = 0;
+    for(var field of blueAllianceStats[Object.keys(blueAllianceStats)[0]]){
+      if(field.name != "Overall Rank"){
+        var listItem = document.createElement("ul");
+        var checkbox = document.createElement("div");
+        listItem.classList.add("mdc-list-item");
+        checkbox.classList.add("mdc-checkbox");
+        checkbox.innerHTML = '<input type="checkbox" class="mdc-checkbox__native-control" data-rank=true data-value='+i+'><div class="mdc-checkbox__background"><svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24"><path class="mdc-checkbox__checkmark-path" fill="none" d="M1.73,12.91 8.1,19.28 22.79,4.59"/></svg><div class="mdc-checkbox__mixedmark"></div></div><div class="mdc-checkbox__ripple"></div>';
+        listItem.appendChild(checkbox);
+        var label = document.createElement('label');
+        label.classList.add("mdc-list-item__text")
+        label.innerText = "Rank in " + field.name;
+        listItem.appendChild(label);
+        fieldList.appendChild(listItem);
+      }
+      i++;
+    }
+    tuneList.addEventListener("change", function(e){
+      if(e.target.checked){
+        if(e.target.dataset.rank == "true"){
+          ranksToShow.push(parseInt(e.target.dataset.value));
+        }else{
+          fieldsToShow.push(parseInt(e.target.dataset.value));
+        }
+      }else{
+        if(e.target.dataset.rank == "true"){
+          ranksToShow.splice(ranksToShow.indexOf(parseInt(e.target.dataset.value)));
+        }else{
+          fieldsToShow.splice(ranksToShow.indexOf(parseInt(e.target.dataset.value)));
+        }
+      }
+      updateTable(fieldsToShow.sort(function(a, b){return a-b}), ranksToShow.sort(function(a, b){return a-b}));
+    })
+    document.getElementById("tbaDownloadButton").hidden = true;
+  }).catch(function(err){
+    console.log(err);
+    snackbar.labelText = "There was an error getting Blue Alliance Data.";
+    snackbar.open();
+  });
 }

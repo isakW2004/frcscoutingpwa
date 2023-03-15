@@ -8,8 +8,9 @@
   <link rel="manifest" href="manifest.json">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="2530 Events">
-  <meta name="theme-color" content="#7DC834" />
+  <meta name="apple-mobile-web-app-title" content="Swerve">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#232323" />
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#7DC834" />
   <link rel="apple-touch-icon" href="assets/images/icon-512-mask.png">
   <title>Welcome - 2530 Scouting</title>
   <link rel="stylesheet" href="assets/bootstrapcustom.min.css">
@@ -19,6 +20,7 @@
   <script type="text/javascript" src="assets/sitewide.js"></script>
   <meta name="description" content="Scouting and more for FRC Team 2530">
   <script type="text/javascript" src="assets/jquery.js"></script>
+  <script type="text/javascript" src="assets/jquery.tablesorter.js"></script>
   <meta name="color-scheme" content="dark light">
   <!--QRCODEJS-->
   <script type="text/javascript" src="assets/qrreader/grid.js"></script>
@@ -77,7 +79,7 @@
             <i class="material-icons mdc-list-item__graphic" aria-hidden="true">system_update_alt</i>
             <span class="mdc-list-item__text drawer_text">Force Update</span>
           </span>
-          <h6 class="mdc-list-group__subheader">FRC Team 2530</h6>
+          <h6 class="mdc-list-group__subheader">Made with 💚 by Team 2530</h6>
         </nav>
         </nav>
       </div>
@@ -100,8 +102,10 @@
             <div id="toolbar" class="toolbar mdc-menu-surface--anchor">
               <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Change Event"
                 id='eventButton' onclick="openEventPicker();">event</button>
-                <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Consolidate Data"
-                onclick="consolidateData();">call_merge</button>
+              <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Consolidate Data"
+                id="consolidateButton" onclick="consolidateData();" hidden>call_merge</button>
+              <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" id="tuneButton" aria-label="Open Data Options"
+                onclick="tuneDialog.open()" hidden>tune</button>
             </div>
         </div>
         </section>
@@ -167,13 +171,6 @@
   </script>
   <script type="text/javascript" src="assets/data.js"></script>
   <script src="assets/charts.js" crossorigin="anonymous"></script>
-  <div hidden id="offline">
-    <img class="offline" src="assets/images/offline.svg">
-    <div class="text-center">
-      <h2>You're Offline</h2>
-      <p>Internet is required to view the latest data.</p>
-    </div>
-  </div>
   <div class="main-tab" id="main-tab">
     <h3>View Data</h3>
     <p>Scan QR codes to download their data, or open a folder to view its contents. You can also view the scouting data
@@ -190,7 +187,8 @@
         <i class="material-icons mdc-button__icon" aria-hidden="true">qr_code_scanner</i>
         <span class="mdc-button__label">Scan QR Codes</span>
       </button>
-      <button class="mdc-button mdc-button--icon-leading" onclick="matchData = pitData =  (localStorage.getItem('matchData') != null) ? JSON.parse(localStorage.getItem('matchData')):[];pitData =  (localStorage.getItem('pitData') != null) ? JSON.parse(localStorage.getItem('pitData')):[];showData()">
+      <button class="mdc-button mdc-button--icon-leading"
+        onclick="matchData = pitData =  (localStorage.getItem('matchData') != null) ? JSON.parse(localStorage.getItem('matchData')):[];pitData =  (localStorage.getItem('pitData') != null) ? JSON.parse(localStorage.getItem('pitData')):[];showData()">
         <span class="mdc-button__ripple"></span>
         <i class="material-icons mdc-button__icon" aria-hidden="true">inventory</i>
         <span class="mdc-button__label">Show Local Data</span>
@@ -248,6 +246,33 @@
     </div>
     <div class="mdc-dialog__scrim"></div>
   </div>
+  <div class="mdc-dialog" id="tuneDialog">
+    <div class="mdc-dialog__container">
+      <div class="mdc-dialog__surface" role="alertdialog" aria-modal="true" aria-describedby="help-dialog-contents">
+        <div class="mdc-dialog__header">
+          <h2 class="mdc-dialog__title">Data Options</h2>
+        </div>
+        <div class="mdc-dialog__content">
+          <ul class="mdc-list" id="tuneList">
+            <li class="mdc-list-item" role="menuitem" id="tbaDownloadButton" onclick="tbaDialogInitialize()">
+              <span class="mdc-list-item__ripple"></span>
+              <span class="mdc-list-item__icon material-icons">cloud_download</span>
+              <span class="mdc-list-item__text">Get Blue Alliance Data</span>
+            </li>
+            <hr class="mdc-list-divider">
+            <small class="mdc-list-group__subheader">Items to Show in Data Table</small>
+          </ul>
+        </div>
+        <div class="mdc-dialog__actions">
+          <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="cancel">
+            <div class="mdc-button__ripple"></div>
+            <span class="mdc-button__label">Ok</span>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="mdc-dialog__scrim"></div>
+  </div>
   <script>
     const selector = '.mdc-button, .mdc-icon-button, .mdc-card__primary-action, .mdc-list-item';
     const ripples = [].map.call(document.querySelectorAll(selector), function (el) {
@@ -256,7 +281,7 @@
     var button = document.getElementById('menuButton')
     var title = document.getElementById('title')
     var qrDialog = new mdc.dialog.MDCDialog(document.getElementById("qrDialog"));
-    document.getElementById("folderSelect").addEventListener("change", function(){
+    document.getElementById("folderSelect").addEventListener("change", function () {
       compileData(this.files);
     });
   </script>
@@ -350,6 +375,7 @@
   <script>
     const dataTable = new mdc.dataTable.MDCDataTable(document.querySelector('.mdc-data-table'));
     const snackbar = new mdc.snackbar.MDCSnackbar(document.getElementById('snackbar'));
+    const tuneDialog = new mdc.dialog.MDCDialog(document.getElementById("tuneDialog"));
   </script>
   <br><br><br>
   <style>
@@ -436,18 +462,23 @@
       height: 100%;
       text-align: center;
     }
-    
-    #folderSelect{
-      position:absolute;
-      top:-1000px;
+
+    #folderSelect {
+      position: absolute;
+      top: -1000px;
     }
-    
-    .pit-list-item .mdc-list-item__secondary-text{
+
+    .pit-list-item .mdc-list-item__secondary-text {
       white-space: normal;
     }
-    
-    .data-card{
-      display:grid;
+
+    .data-card {
+      display: grid;
       grid-template-columns: 50% 50%;
+    }
+
+    thead {
+      position: sticky;
+      top: 0;
     }
   </style>

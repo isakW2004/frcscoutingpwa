@@ -329,10 +329,16 @@ noscript {
     .mdc-tab:not(.mdc-tab--active) .mdc-tab__text-label, .mdc-tab:not(.mdc-tab--active) .mdc-tab__icon{
         color: rgba(255, 255, 255, 0.6);
     }
+    .mdc-linear-progress__buffer-bar{
+        background-color: var(--mdc-theme-surface);
+    }
 }
 .red-alliance-text{
     color: #da3434 !important;
 }
 .blue-alliance-text{
     color: #487fcc !important;
+}
+.mdc-dialog__actions, #standscout, #pitscout{
+    margin-bottom: env(safe-area-inset-bottom) !important;
 }
