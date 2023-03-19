@@ -16,8 +16,6 @@ function continueStand() {
     if (localStorage.getItem("standScoutStart")) {
         scoutingBoard();
         continuePit();
-    } else {
-        console.log("Setting up stand scouting");
     }
     if (localStorage.getItem("currentEvent") == null) {
         openEventPicker();
@@ -69,7 +67,6 @@ function startScouting() {
     localStorage.setItem("standScoutStart", true);
     progress.open();
     fetchMatches().then(function(){
-        console.log(matchesStand);
         scoutingBoard();
         progress.close();
     }).catch(function(){
@@ -115,7 +112,6 @@ async function fetchMatchesAjax(team, matches) {
                         matchesStandScouting.push(match.match_number);
                         matchesStandScouting = removeDuplicates(matchesStandScouting);
                     }
-                    console.log(match)
                     localStorage.setItem("matchesStand", JSON.stringify(matchesStandScouting));
                     localStorage.setItem("matchesStandDetails", JSON.stringify(matchesStandDetails));
                 }
@@ -161,7 +157,6 @@ function scoutingBoard() {
     fab.innerHTML = '  <div class="mdc-fab__ripple"></div><span class="mdc-fab__icon material-icons">add</span>';
     fab.onclick = function(){
         var matchNumber = window.prompt("Enter match number");
-        console.log(matchNumber);
         if(!isNaN(matchNumber) && matchNumber != null){
             openMatchScoutForm(parseInt(matchNumber));
         }else{
@@ -199,7 +194,7 @@ const standFields = [
         "type": "multi-select",
         "title": "Autonomous",
         "id": "auto",
-        "options" : ["No Autonomous", "Autonomous did not work", "Left Community", "Scored", "Docked not engaged", "Docked and Engaged"]
+        "options" : ["No Autonomous", "Autonomous did not work", "Left Community", "Scored", "Docked", "Engaged (Balanced)"]
     },
         {
         "type": "dropdown",
@@ -235,9 +230,9 @@ const standFields = [
         "title": "Match Won?",
         "id": "won",
     },
-];
-
-const pitFields = [
+  ];
+  
+  const pitFields = [
     {
         "type": "checkbox",
         "title": "Can Do Cones",
@@ -286,7 +281,7 @@ const pitFields = [
         "type": "multi-select",
         "title": "Autonomous Strategy",
         "id": "auto",
-        "options" : ["No Autonomous", "Leaving Community", "Scored", "Docked not engaged", "Docked and Engaged"]
+        "options" : ["No Autonomous", "Leaving Community", "Scored", "Dock", "Engage (Balance)"]
     },
     {
         "type": "dropdown",
@@ -300,7 +295,7 @@ const pitFields = [
         "isTextArea" : true,
         "id": "comment",
     },
-]
+  ]
 
 var pitCheckboxes;
 var checkedItems;
@@ -312,7 +307,6 @@ function continuePit() {
         checkedItems= JSON.parse(localStorage.getItem("checkedItems"));
     }
     if (localStorage.getItem("standScoutStart")) {
-        console.log('Pit Scouting Continued')
         document.getElementById("pitscout").innerHTML = "<h2 class='text-center'>Pit Scouting</h2>"
         document.getElementById("pitscout").innerHTML = document.getElementById("pitscout").innerHTML + '<ul class="mdc-list mdc-list--two-line scoutlist">';
         if (allTeams == null) {
@@ -439,7 +433,6 @@ function createField(field, team) {
             element.push(item.querySelector("input"));
         }
         var select = new mdc.select.MDCSelect(node);
-        console.log(select);
         node.addEventListener("change", function(e){
             select.foundation.blur = function(){select.root.classList.remove("mdc-select--focused")};
             select.selectedText.innerText = getValueOfField([node, element, field.type]).length + " Items Selected"
@@ -808,9 +801,15 @@ function nativeShare(){
     }
     var data = {files:files, title:"Scouting Data", text:"Here's some cool scouting data"};
     if(navigator.canShare(data)){
-        navigator.share(data);
+        navigator.share(data).catch(err=>{
+            if(err.name != "AbortError"){
+                snackbar.labelText= "An error occured while sharing.";
+                snackbar.open();
+            }
+            console.log(err);
+        });
     }else{
-        snackbar.labelText("Unable to share scouting data.");
+        snackbar.labelText = "Unable to share scouting data.";
         snackbar.open();
     }
 }
@@ -818,9 +817,7 @@ function nativeShare(){
 function checkCheck(team){
     if(checkedItems.indexOf('team'+team) != -1){
         $('#pit'+team+'checkbox').ready(function () {       //Waits until checkbox is ready before checking
-            $('#pit'+team+'checkbox').ready(function () {       //Waits until checkbox is ready before checking
-                $('#pit'+team+'checkbox').prop('checked',true);
-                });          
-          });          
+            $('#pit'+team+'checkbox').prop('checked',true);     
+        });          
     }
 }

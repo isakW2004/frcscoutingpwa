@@ -57,3 +57,11 @@ async function forceUpdate(){
     window.location.reload();
   }
 }
+
+function pickCustomEvent(){
+  var eventName = window.prompt("Custom event code");
+  if(eventName != null && eventName != ""){
+    localStorage.setItem("currentEvent", eventName);
+    window.location.reload();
+  }
+}

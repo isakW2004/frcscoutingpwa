@@ -79,7 +79,7 @@
             <i class="material-icons mdc-list-item__graphic" aria-hidden="true">system_update_alt</i>
             <span class="mdc-list-item__text drawer_text">Force Update</span>
           </span>
-          <h6 class="mdc-list-group__subheader">Made with 💚 by Team 2530</h6>
+          <h6 class="mdc-list-group__subheader">Made by Team 2530</h6>
         </nav>
         </nav>
       </div>
@@ -123,7 +123,7 @@
       <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
       <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
      -->Choose an Event<br>
-        <small class="text-muted text-center">Changing events will delete unsaved data.</small><!--
+        <small class="text-muted text-center">Changing events will delete data on this device. <a onclick="pickCustomEvent()">Custom Event</a></small><!--
    -->
       </h2>
       <div class="mdc-dialog__content" id="my-dialog-content">
@@ -227,11 +227,15 @@
             close
           </button>
         </div>
-        <div class="mdc-dialog__content qr-scan-dialog-container">
-          <video id="qr-v"></video>
-          <canvas id="qr-canvas" hidden></canvas>
-          <h5 id="qrHelperText">Looking for QR Codes</h5>
-          <div id="scannedData"></div>
+        <div class="mdc-dialog__content qr-dialog-container">
+          <div>
+            <video id="qr-v" style="max-width: 100%; max-height: 100%; overflow: hidden;"></video>
+            <canvas id="qr-canvas" hidden></canvas>
+          </div>
+          <div>
+            <h5 id="qrHelperText">Looking for QR Codes</h5>
+            <div id="scannedData"></div>
+          </div>
         </div>
         <div class="mdc-dialog__actions">
           <button type="button" id="saveButton" class="mdc-button mdc-dialog__button mdc-button--raised"

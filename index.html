@@ -58,7 +58,7 @@
             <i class="material-icons mdc-list-item__graphic" aria-hidden="true">system_update_alt</i>
             <span class="mdc-list-item__text drawer_text">Force Update</span>
           </span>
-          <h6 class="mdc-list-group__subheader">Made with 💚 by Team 2530</h6>
+          <h6 class="mdc-list-group__subheader">Made by Team 2530</h6>
         </nav>
         </nav>
       </div>
@@ -80,8 +80,6 @@
               <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Change Event"
                 id='eventButton' onclick="openEventPicker();">event</button>
             </div>
-            <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Get Help"
-              onclick="helpWindow.open()">help</button>
         </div>
         </section>
     </div>
@@ -96,7 +94,7 @@
     <div class="mdc-dialog__surface" role="alertdialog" aria-modal="true" aria-labelledby="my-dialog-title"
       aria-describedby="my-dialog-content">
       <h2 class="mdc-dialog__title" id="my-dialog-title">Choose an Event<br>
-        <small class="text-muted text-center">Changing events will delete unsaved data. <a onclick="localStorage.clear();localStorage.setItem('currentEvent', window.prompt('Event Code'));window.location.reload();">Custom Event</a></small>
+        <small class="text-muted text-center">Changing events will delete data on this device. <a onclick="pickCustomEvent()">Custom Event</a></small>
       </h2>
       <div class="mdc-dialog__content" id="my-dialog-content">
         <ul class="mdc-list" id="eventlist">
@@ -163,37 +161,16 @@
   </div>
   <noscript class="text-center noscript">
     <h4><i class="material-icons align-bottom">error</i> Javascript Not Enabled</h4>
-    <p>Get off of Netscape Navigator. Javascript is required for this website to function properly. Or at all.</p>
+    <p>Javascript is required for this website to function.</p>
     <style>
       .actions {
         display: none;
       }
-
-      html {
-        --mdc-theme-primary: red !important
-      }
     </style>
   </noscript>
-  <div class="mdc-dialog" id="help">
-    <div class="mdc-dialog__container">
-      <div class="mdc-dialog__surface" role="alertdialog" aria-modal="true" aria-describedby="help-dialog-contents">
-        <div class="mdc-dialog__content" id="help-dialog-contents">
-          Select a function for this device. Pit Kiosk mode is an informational kiosk for scouters on other teams.
-        </div>
-        <div class="mdc-dialog__actions">
-          <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="cancel">
-            <div class="mdc-button__ripple"></div>
-            <span class="mdc-button__label">Ok</span>
-          </button>
-        </div>
-      </div>
-    </div>
-    <div class="mdc-dialog__scrim"></div>
-  </div>
 
   <script>
     var installButton = document.getElementById("installPrompt")
-    const helpWindow = new mdc.dialog.MDCDialog(document.getElementById("help"));
     window.addEventListener("beforeinstallprompt", function (beforeInstallPromptEvent) {
       installButton.addEventListener("click", function (mouseEvent) {
         beforeInstallPromptEvent.prompt();
