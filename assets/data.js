@@ -81,6 +81,11 @@ const standFields = [
       "weight": 1
   },
   {
+    "type": "checkbox",
+    "title": "Does Links",
+    "id": "links",
+  },
+  {
       "type": "multi-select",
       "title": "Autonomous",
       "id": "auto",
@@ -98,6 +103,13 @@ const standFields = [
       "id": "rating",
       "min" : 1,
       "max" : 10
+  },
+  {
+      "type": "scale",
+      "title": "# Robots on Charge Station",
+      "id": "rcharge",
+      "min" : 0,
+      "max" : 3
   },
   {
       "type": "text",
@@ -830,4 +842,89 @@ function tbaDialogInitialize(){
     snackbar.labelText = "There was an error getting Blue Alliance Data.";
     snackbar.open();
   });
+}
+
+function csvExport(){
+  var matchSheet = [];
+  var columnNames = ["Team #", "Match #"];
+  for(var field of standFields){
+    columnNames.push(field.title);
+  }
+  matchSheet.push(columnNames)
+  for(var key of Object.keys(matchData)){
+    for(var match of matchData[key]){
+      var column =[];
+      column.push(key.split("team")[1]);
+      column.push(match.matchNumber);
+      for(var field of standFields){
+        if(typeof match[field.id] != "undefined"){
+          switch(field.type){
+            case "dropdown":
+              column.push(field.options[match[field.id]]);
+              break;
+            case "multi-select":
+              var selections = [];
+              for(var option of match[field.id]){
+                selections.push(field[option]);
+              }
+              column.push(selections.join(", "));
+              break;
+            default:
+              column.push(match[field.id]);
+          }
+        }else{
+          column.push("Error!")
+        }
+      }
+      matchSheet.push(column);
+    }
+  }
+  var pitSheet = [];
+  var columnNames = ["Team #"];
+  for(var field of pitFields){
+    columnNames.push(field.title);
+  }
+  pitSheet.push(columnNames);
+  for(var key of Object.keys(pitData)){
+    if(key.indexOf("team") != -1){
+      var column =[];
+      column.push(key.split("team")[1]);
+      for(var field of pitFields){
+        if(typeof pitData[key][field.id] != "undefined"){
+          switch(field.type){
+            case "dropdown":
+              column.push(field.options[pitData[key][field.id]]);
+              break;
+            case "multi-select":
+              var selections = [];
+              for(var option of pitData[key][field.id]){
+                selections.push(field[option]);
+              }
+              column.push(selections.join(", "));
+              break;
+            default:
+              column.push(pitData[key][field.id]);
+          }
+        }else{
+          column.push("Error!")
+        }
+      }
+      pitSheet.push(column)
+    }
+  }
+  var matchCSV = "";
+  var pitCSV = "";
+  for(var row of matchSheet){
+    matchCSV += "\"" + row.join("\",\"") + "\"\n";
+  }
+  for(var row of pitSheet){
+    pitCSV += "\"" + row.join("\",\"") + "\"\n";
+  }
+  var downloader = document.getElementById("dataDownloader");
+  downloader.setAttribute("href", "data:text/csv;charset=utf-8," + encodeURIComponent(matchCSV));
+  downloader.setAttribute("download", "match-data.csv");
+  downloader.click();
+  downloader.setAttribute("href", "data:text/csv;charset=utf-8," + encodeURIComponent(pitCSV));
+  downloader.setAttribute("download", "pit-data.csv");
+  downloader.click();
 }

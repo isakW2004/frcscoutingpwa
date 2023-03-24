@@ -191,6 +191,11 @@ const standFields = [
         "weight": 1
     },
     {
+      "type": "checkbox",
+      "title": "Does Links",
+      "id": "links",
+    },
+    {
         "type": "multi-select",
         "title": "Autonomous",
         "id": "auto",
@@ -208,6 +213,13 @@ const standFields = [
         "id": "rating",
         "min" : 1,
         "max" : 10
+    },
+    {
+        "type": "scale",
+        "title": "# Robots on Charge Station",
+        "id": "rcharge",
+        "min" : 0,
+        "max" : 3
     },
     {
         "type": "text",
