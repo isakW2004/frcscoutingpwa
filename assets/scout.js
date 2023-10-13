@@ -39,6 +39,28 @@ function fetchTeams() {
             document.getElementById("fetch-button").disabled = 'true';
             document.getElementById("fetch-label").innerHTML = 'Fetched';
             teams = contents;
+            if(window.confirm("There isn't a team roster available for this event yet. Would you like to import one?")){
+                var rosterPrompt = document.createElement("div");
+                rosterPrompt.innerHTML = '<h3>Select a roster to import</h3><br>';
+                var rosterInput = document.createElement("input");
+                teamCheck.parentElement.insertBefore(rosterPrompt, teamCheck);
+                rosterInput.setAttribute("type", "file");
+                rosterInput.setAttribute("accept", "application/json");
+                rosterPrompt.appendChild(rosterInput);
+                rosterInput.oninput = function(){
+                    rosterInput.files[0].text().then(function(roster){
+                        console.log(roster);
+                        rosterPrompt.remove();
+                        localStorage.setItem('allTeams', roster);
+                        allTeams = JSON.parse(roster);
+                        var i;
+                        for (i = 0; i < allTeams.length; i++) {
+                            teamCheck.innerHTML = teamCheck.innerHTML + '<div class="mdc-checkbox"><input type="checkbox" class="mdc-checkbox__native-control" id="' + allTeams[i].key + '"/> <div class="mdc-checkbox__background"><svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24"><path class="mdc-checkbox__checkmark-path" fill="none" d="M1.73,12.91 8.1,19.28 22.79,4.59"/></svg><div class="mdc-checkbox__mixedmark"></div></div><div class="mdc-checkbox__ripple"></div></div><label for="' + allTeams[i].key + '">' + allTeams[i].team_number + " " + allTeams[i].nickname + '</label><br>'
+                        }
+                    })
+                }
+                return;
+            }
             localStorage.setItem('allTeams', JSON.stringify(contents));
             allTeams = contents;
             var i;
