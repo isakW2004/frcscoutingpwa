@@ -1,0 +1,173 @@
+{
+    "matchFields": [
+        {
+            "type": "number",
+            "title": "Cones Attempted",
+            "id": "cones",
+            "weight": 2
+        },
+        {
+            "type": "number",
+            "title": "Cubes Attempted",
+            "id": "cubes",
+            "weight": 1
+        },
+        {
+            "type": "checkbox",
+            "title": "Smart Cargo Placement (Links)",
+            "id": "links"
+        },
+        {
+            "type": "multi-select",
+            "title": "Autonomous",
+            "id": "auto",
+            "options": [
+                "No Autonomous",
+                "Autonomous did not work",
+                "Left Community",
+                "Scored",
+                "Scored Multiple Pieces",
+                "Docked",
+                "Engaged (Balanced)"
+            ]
+        },
+        {
+            "type": "dropdown",
+            "title": "Endgame",
+            "id": "endgame",
+            "options": [
+                "No Endgame",
+                "Parked within Community",
+                "Docked",
+                "Docked and Engaged"
+            ]
+        },
+        {
+            "type": "scale",
+            "title": "Rate the Performance",
+            "id": "rating",
+            "min": 1,
+            "max": 10
+        },
+        {
+            "type": "scale",
+            "title": "Robot Speed",
+            "id": "speed",
+            "min": 1,
+            "max": 5
+        },
+        {
+            "type": "scale",
+            "title": "# Robots on Charge Station",
+            "id": "rcharge",
+            "min": 0,
+            "max": 3
+        },
+        {
+            "type": "text",
+            "title": "Comments",
+            "id": "comment",
+            "isTextArea": true
+        },
+        {
+            "type": "checkbox",
+            "title": "Sustainability Bonus",
+            "id": "susBonus"
+        },
+        {
+            "type": "checkbox",
+            "title": "Activation Bonus",
+            "id": "activationBonus"
+        },
+        {
+            "type": "checkbox",
+            "title": "Match Won?",
+            "id": "won"
+        }
+    ],
+    "pitFields": [
+        {
+            "type": "checkbox",
+            "title": "Can Do Cones",
+            "id": "cones"
+        },
+        {
+            "type": "checkbox",
+            "title": "Can Do Cubes",
+            "id": "cubes"
+        },
+        {
+            "type": "checkbox",
+            "title": "Can Pick Up From Floor",
+            "id": "floorPickup"
+        },
+        {
+            "type": "checkbox",
+            "title": "Can Pick Up and Score Tipped Cones",
+            "id": "tippedCones"
+        },
+        {
+            "type": "checkbox",
+            "title": "Can Pick Up From Human Player",
+            "id": "humanPlayer"
+        },
+        {
+            "type": "text",
+            "title": "Describe Grabber Mechanism",
+            "isTextArea": true,
+            "id": "grabber"
+        },
+        {
+            "type": "dropdown",
+            "title": "Drive Type",
+            "id": "drive",
+            "options": [
+                "Tank",
+                "West Coast Drive",
+                "Swerve",
+                "Mecanum",
+                "Other (add comment)"
+            ]
+        },
+        {
+            "type": "multi-select",
+            "title": "Autonomous Abilities",
+            "id": "auto",
+            "options": [
+                "No Autonomous",
+                "Leaving Community",
+                "Score",
+                "Score Multiple Pieces",
+                "Dock",
+                "Engage (Balance)"
+            ]
+        },
+        {
+            "type": "text",
+            "title": "Describe Auto Presets",
+            "isTextArea": true,
+            "id": "autoPresets"
+        },
+        {
+            "type": "dropdown",
+            "title": "Endgame Strategy",
+            "id": "endgame",
+            "options": [
+                "Parking",
+                "Dock w/ No Auto Engaging",
+                "Dock w/ Auto Engaging"
+            ]
+        },
+        {
+            "type": "text",
+            "title": "Comments",
+            "isTextArea": true,
+            "id": "comment"
+        }
+    ],
+    "gameName":"Charged Up",
+    "configName":"Charged Up Default",
+    "year":2023,
+    "desc":"Scout efficiently and effectively with the standard 2023 Swerve configuration",
+    "version":1.0
+}

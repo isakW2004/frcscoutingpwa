@@ -19,7 +19,6 @@
   <link rel="stylesheet" href="assets/style.css">
   <script type="text/javascript" src="assets/sitewide.js"></script>
   <meta name="description" content="Scouting and more for FRC Team 2530">
-  <script type="text/javascript" src="assets/jquery.js"></script>
   <meta name="color-scheme" content="dark light">
 </head>
 <script>
@@ -78,7 +77,7 @@
           <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
             <div id="toolbar" class="toolbar mdc-menu-surface--anchor">
               <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Change Event"
-                id='eventButton' onclick="openEventPicker();">event</button>
+                id='eventButton' onclick="eventPicker.open()">event</button>
             </div>
         </div>
         </section>
@@ -89,26 +88,44 @@
   </div>
 </body>
 
-<div class="mdc-dialog">
+<div class="mdc-dialog" id="event-picker">
   <div class="mdc-dialog__container">
-    <div class="mdc-dialog__surface" role="alertdialog" aria-modal="true" aria-labelledby="my-dialog-title"
-      aria-describedby="my-dialog-content">
-      <h2 class="mdc-dialog__title" id="my-dialog-title">Choose an Event<br>
-        <small class="text-muted text-center">Changing events will delete data on this device. <a onclick="pickCustomEvent()">Custom Event</a></small>
-      </h2>
-      <div class="mdc-dialog__content" id="my-dialog-content">
-        <ul class="mdc-list" id="eventlist">
-        </ul>
+    <div class="mdc-dialog__surface" role="alertdialog" aria-modal="true" aria-describedby="my-dialog-content">
+      <h2 class="mdc-dialog__title">Choose an Event<br></h2>
+      <div class="mdc-dialog__content">
+        <strong class="text-muted">Heads up! Changing events will clear scouting data on this device. Make sure you export any important data before doing this.</strong><br>
+        <label class="mdc-text-field mdc-text-field--outlined">
+          <span class="mdc-notched-outline">
+            <span class="mdc-notched-outline__leading"></span>
+            <span class="mdc-notched-outline__notch">
+              <span class="mdc-floating-label">Your Team Number</span>
+            </span>
+            <span class="mdc-notched-outline__trailing"></span>
+          </span>
+          <input type="number" class="mdc-text-field__input">
+        </label>
+        <button class="mdc-button" id="team-submit-button">
+          <span class="mdc-button__ripple"></span>
+          <span class="mdc-button__indicator" hidden style="height:24px; width:24px;"></span>
+          <span class="mdc-button__icon material-icons">refresh</span>
+          <span class="mdc-button__text">Get Events</span>
+        </button>
+        <p id="event-picker__error-text"></p>
+        <div class="mdc-list mdc-list--two-line event-list mdc-form-field"></div>
       </div>
       <div class="mdc-dialog__actions">
         <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
           <div class="mdc-button__ripple"></div>
           <span class="mdc-button__label">Cancel</span>
         </button>
-        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="accept"
-          onclick="setEvent()">
+        <button class="mdc-button button--destructive" onclick="eventPicker.pickCustomEvent()">
+          <span class="mdc-button__ripple"></span>
+          <span class="mdc-button__text">Other Event</span>
+        </button>
+        <button type="button" class="mdc-button mdc-dialog__button mdc-button--raised button--destructive" data-mdc-dialog-action="accept"
+          onclick="eventPicker.confirmEvent()">
           <div class="mdc-button__ripple"></div>
-          <span class="mdc-button__label">OK</span>
+          <span class="mdc-button__label">Set Event</span>
         </button>
       </div>
     </div>
@@ -137,7 +154,7 @@
     document.body.addEventListener('MDCDrawer:closed', () => {
       mainContentEl.querySelector('input, button').focus();
     });
-    const eventPicker = new mdc.dialog.MDCDialog(document.querySelector('.mdc-dialog'));
+    const eventPicker = new EventPicker(document.getElementById("event-picker"));
   </script>
   <div class="actions">
     <h2 class="welcome">Welcome to Swerve Scout</h2>
