@@ -59,139 +59,6 @@ function showData() {
   })
 }
 
-
-const matchFields = [
-  {
-    "type": "number",
-    "title": "Cones Scored",
-    "id": "cones",
-    "weight": 2
-  },
-  {
-    "type": "number",
-    "title": "Marshmallows Scored",
-    "id": "cubes",
-    "weight": 1
-  },
-  {
-    "type": "checkbox",
-    "title": "Does Links",
-    "id": "links",
-  },
-  {
-    "type": "multi-select",
-    "title": "Autonomous",
-    "id": "auto",
-    "options": ["No Autonomous", "Autonomous did not work", "Left Community", "Scored", "Docked", "Engaged (Balanced)"]
-  },
-  {
-    "type": "dropdown",
-    "title": "Endgame",
-    "id": "endgame",
-    "options": ["No Endgame", "Parked within Community", "Docked", "Docked and Engaged"]
-  },
-  {
-    "type": "scale",
-    "title": "Rate the Performance",
-    "id": "rating",
-    "min": 1,
-    "max": 10
-  },
-  {
-    "type": "scale",
-    "title": "# Robots on Charge Station",
-    "id": "rcharge",
-    "min": 0,
-    "max": 3
-  },
-  {
-    "type": "text",
-    "title": "Comments",
-    "id": "comment",
-    "isTextArea": true,
-  },
-  {
-    "type": "checkbox",
-    "title": "Sustainability Bonus",
-    "id": "susBonus",
-  },
-  {
-    "type": "checkbox",
-    "title": "Activation Bonus",
-    "id": "activationBonus",
-  },
-  {
-    "type": "checkbox",
-    "title": "Match Won?",
-    "id": "won",
-  },
-];
-
-const pitFields = [
-  {
-    "type": "checkbox",
-    "title": "Can Do Cones",
-    "id": "cones",
-  },
-  {
-    "type": "checkbox",
-    "title": "Can Do Cubes",
-    "id": "cubes",
-  },
-  {
-    "type": "checkbox",
-    "title": "Can Pick Up From Floor",
-    "id": "floorPickup",
-  },
-  {
-    "type": "checkbox",
-    "title": "Can Pick Up and Score Tipped Cones",
-    "id": "tippedCones",
-  },
-  {
-    "type": "checkbox",
-    "title": "Can Pick Up From Human Player",
-    "id": "humanPlayer",
-  },
-  {
-    "type": "scale",
-    "title": "Robot Speed",
-    "id": "speed",
-    "min": 1,
-    "max": 5,
-  },
-  {
-    "type": "text",
-    "title": "Describe Grabber Mechanism",
-    "isTextArea": true,
-    "id": "grabber",
-  },
-  {
-    "type": "dropdown",
-    "title": "Drive Type",
-    "id": "drive",
-    "options": ["Tank", "West Coast Drive", "Swerve", "Mecanum", "Other (add comment)"]
-  },
-  {
-    "type": "multi-select",
-    "title": "Autonomous Strategy",
-    "id": "auto",
-    "options": ["No Autonomous", "Leaving Community", "Scored", "Dock", "Engage (Balance)"]
-  },
-  {
-    "type": "dropdown",
-    "title": "Endgame Strategy",
-    "id": "endgame",
-    "options": ["Parking", "Dock w/ No Auto Engaging", "Dock w/ Auto Engaging"]
-  },
-  {
-    "type": "text",
-    "title": "Comments",
-    "isTextArea": true,
-    "id": "comment",
-  },
-]
-
 function getAverageOfMatch(id, number) {
   try {
     var matches = matchData['team' + number];
@@ -241,15 +108,17 @@ class WindowManager{
   windows = [];
 
   static handleMouseDown(e, x){
-    if(document.documentElement.clientWidth)
-    var totalWidth = 0;
-    for(var i = 0; i < windowManager.windows.indexOf(e.originalTarget.windowToResize); i++){
+    if(document.documentElement.clientWidth){
+      var totalWidth = 0;
+    }
+    var target = e.target || e.srcElement || e.originalTarget;
+    for(var i = 0; i < windowManager.windows.indexOf(target.windowToResize); i++){
       totalWidth += windowManager.windows[i].root.clientWidth;
     }
     if(x - totalWidth > 375 && document.documentElement.clientWidth - (x - totalWidth) >= (windowManager.windows.length - 1) * 375){
-      e.originalTarget.windowToResize.root.style.width = x - totalWidth + "px";
-      e.originalTarget.windowToResize.root.style.maxWidth = x - totalWidth + "px";
-      e.originalTarget.windowToResize.root.style.minWidth = x - totalWidth + "px";
+      target.windowToResize.root.style.width = x - totalWidth + "px";
+      target.windowToResize.root.style.maxWidth = x - totalWidth + "px";
+      target.windowToResize.root.style.minWidth = x - totalWidth + "px";
       for(var windowEl of windowManager.windows){
         windowEl.handleDisplayChange();
       }
@@ -257,6 +126,11 @@ class WindowManager{
   }
 
   static handleWindowResize(managerInstance){
+    if(managerInstance.windows.length > 1  && managerInstance.root.offsetWidth < managerInstance.windows.length * 375){
+      snackbar.labelText = "Closed window \"" + managerInstance.windows[managerInstance.windows.length - 1].title.innerText + "\" due to insufficient width";
+      snackbar.open();
+      managerInstance.closeWindow(managerInstance.windows.length - 1);
+    }
     for(const windowEl of managerInstance.windows){
       windowEl.root.style.width = managerInstance.root.offsetWidth / managerInstance.windows.length + "px";
       windowEl.root.style.minWidth = "";
@@ -274,11 +148,12 @@ class WindowManager{
     resizer.classList.add("window__resizer");
     resizer.windowToResize = this.windows[this.windows.length - 1];
     resizer.addEventListener("mousedown", function(e) {
-      e.originalTarget.classList.add("window__resizer--active");
+      var target = e.target || e.srcElement || e.originalTarget;
+      target.classList.add("window__resizer--active");
       e.preventDefault();
-      var originalX = e.originalTarget.offsetLeft;
+      var originalX = target.offsetLeft;
       document.onmousemove = (f) => WindowManager.handleMouseDown(e, f.clientX, originalX);
-      document.onmouseup = () => {document.onmousemove = null; e.originalTarget.classList.remove("window__resizer--active")};
+      document.onmouseup = () => {document.onmousemove = null; target.classList.remove("window__resizer--active")};
     });
     windowEl.resizer= resizer;
     this.root.appendChild(resizer);
@@ -292,6 +167,17 @@ class WindowManager{
     for(const windowEl of this.windows){
       windowEl.handleDisplayChange();
     }
+  }
+
+  closeWindow(index){
+    this.windows[index].root.remove();
+    this.windows[index].resizer.remove();
+    this.windows.splice(index,1);
+  }
+
+  closeAllWindows(){
+    this.root.innerHTML = "";
+    this.windows = [];
   }
 }
 
@@ -307,33 +193,47 @@ class TeamView{
     this.root = document.createElement("div");
     this.root.classList.value = "mdc-card-columns team-info-columns";
     this.data = { match: matchData["team" + team], pit: pitData["team" + team] };
-    this.reconstruct();
+    try{
+      this.reconstruct();
+    }catch(e){
+      snackbar.labelText = "There was an error opening team view. Make sure you are using the correct configuration.";
+      snackbar.open();
+      throw new Error(e);
+    }
   }
 
   reconstruct() {
     this.root.innerHTML = "";
-    if (matchData["team" + this.team]) {
-      this.root.appendChild(this._makeCheckboxCard(matchFields.filter(field => field.type == "checkbox")));
-      this.root.appendChild(this._makeNumberCard(matchFields.filter(field => field.type == "number" || field.type == "scale")));
-      for (var field of matchFields) {
-        switch (field.type) {
-          case "text":
-            this.root.appendChild(this._makeTextCard(field));
-            break;
-          case "dropdown":
-            this.root.appendChild(this._makeDropdownCard(field))
-            break;
-          case "multi-select":
-            this.root.appendChild(this._makeMultiSelectCard(field));
-            break;
+    if(!matchData["team" + this.team] && !pitData["team" + this.team] && !blueAllianceStats){
+      var card = document.createElement("div");
+      card.style.padding = "10px";
+      card.classList.add('mdc-card')
+      card.appendChild(this._makeCardTitle("There's no data for this team :("));
+      this.root.appendChild(card);
+    }else{
+      if (matchData["team" + this.team]) {
+        this.root.appendChild(this._makeCheckboxCard(matchFields.filter(field => field.type == "checkbox")));
+        this.root.appendChild(this._makeNumberCard(matchFields.filter(field => field.type == "number" || field.type == "scale")));
+        for (var field of matchFields) {
+          switch (field.type) {
+            case "text":
+              this.root.appendChild(this._makeTextCard(field));
+              break;
+            case "dropdown":
+              this.root.appendChild(this._makeDropdownCard(field))
+              break;
+            case "multi-select":
+              this.root.appendChild(this._makeMultiSelectCard(field));
+              break;
+          }
         }
       }
-    }
-    if (pitData["team" + this.team]) {
-      this.root.appendChild(this._makePitCard());
-    }
-    if(blueAllianceStats){
-      this.root.appendChild(this._makeTBACard());
+      if (pitData["team" + this.team]) {
+        this.root.appendChild(this._makePitCard());
+      }
+      if(blueAllianceStats){
+        this.root.appendChild(this._makeTBACard());
+      }
     }
     this.masonry = new Masonry(this.root, {itemSelector:".mdc-card", fitWidth:true, transitionDuration:"0.2s"});
   }
@@ -509,31 +409,38 @@ class TeamView{
     setTimeout(function () { document.getElementById('tableContainer').hidden = true; document.getElementById('tableContainer').classList.remove('disappearing') }, 200);
     document.getElementById('window-container').hidden = false;
     windowManager.addWindow(new Window(instance));
-    title.innerHTML = "Team " + instance.team + " " + instance.teamName;
+    title.innerHTML = "Team View";
     navButton.hidden = true;
     document.getElementById("backButton").hidden = false
-    document.getElementById('favoriteButton').hidden = false;
+    document.getElementById('newWindowButton').hidden = false;
     document.getElementById('eventButton').hidden = true;
-    document.getElementById('favoriteButton').onclick = function () { favoriteTeam(team.team_number) };
-    if (localStorage.getItem('favoriteTeams') != null) {
-      if (JSON.parse(localStorage.getItem('favoriteTeams')).indexOf(team.team_number) != -1) {
-        document.getElementById('favoriteButton').innerHTML = 'favorite';
-      } else {
-        document.getElementById('favoriteButton').innerHTML = 'favorite_outline';
-      }
-    }
   }
-  static close() {
+
+  static close(purge) {
     title.innerHTML = "View Data";
     navButton.hidden = false;
-    document.getElementById('favoriteButton').hidden = true;
+    document.getElementById('newWindowButton').hidden = true;
     document.getElementById('eventButton').hidden = false;
     document.getElementById('tableContainer').classList.remove('disappearing')
-    document.getElementById("backButton").hidden = true
+    document.getElementById("backButton").hidden = true;
     document.getElementById('tableContainer').hidden = false;
     document.getElementById('window-container').classList.add('disappearing');
-    document.getElementById('tableContainer').classList.add('appearing')
-    setTimeout(function () { document.getElementById('tableContainer').classList.remove('appearing'); document.getElementById('window-container').classList.remove('disappearing'); document.getElementById('window-container').hidden = true; }, 200);
+    document.getElementById('tableContainer').classList.add('appearing');
+    setTimeout(function () { document.getElementById('tableContainer').classList.remove('appearing'); document.getElementById('window-container').classList.remove('disappearing'); document.getElementById('window-container').hidden = true; 
+      if(purge){
+        windowManager.closeAllWindows()
+      }
+    }, 200);
+  }
+  static newWindow(){
+    if(windowManager.root.offsetWidth >= (windowManager.windows.length + 1) * 375){
+      TeamView.close(false);
+      snackbar.labelText = "Select a team to split view";
+      snackbar.open();
+    }else{
+      snackbar.labelText = "Your screen is too small for another window. Zoom out and try again.";
+      snackbar.open();
+    }
   }
 }
 
@@ -609,34 +516,6 @@ const dropdown = {
       return [0];
     }
     return output;
-  }
-}
-
-function favoriteTeam(team) {
-  var favoriteTeams = JSON.parse(localStorage.getItem('favoriteTeams'))
-  if (favoriteTeams == null) {
-    favoriteTeams = [];
-  }
-  if (favoriteTeams.indexOf(team) == -1) {
-    document.getElementById('favoriteButton').innerHTML = 'favorite';
-    favoriteTeams.push(team)
-    localStorage.setItem('favoriteTeams', JSON.stringify(favoriteTeams))
-  } else {
-    document.getElementById('favoriteButton').innerHTML = 'favorite_outline';
-    favoriteTeams.splice(favoriteTeams.indexOf(team, 1));
-    localStorage.setItem('favoriteTeams', JSON.stringify(favoriteTeams))
-  }
-}
-function tableFavorite(team) {
-  var favoriteTeams = JSON.parse(localStorage.getItem('favoriteTeams'))
-  if (favoriteTeams != null) {
-    if (favoriteTeams.indexOf(team) != -1) {
-      return '<i class="material-icons" style="font-size: 13px !important; vertical-align:middle;">favorite</i> '
-    } else {
-      return ''
-    }
-  } else {
-    return ''
   }
 }
 
@@ -815,6 +694,11 @@ async function compileData(files) {
 }
 var downloader = document.createElement("a")
 function consolidateData() {
+  if(!matchData && !pitData){
+    snackbar.labelText = "There is no scouting data to export";
+    snackbar.open();
+    return;
+  }
   try {
     if (matchData) {
       var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(matchData));
@@ -994,7 +878,7 @@ function updateTable(valueIndexes, rankIndexes) {
       row.addCell(cell);
     }
     for (var dataIndex of rankIndexes) {
-      var cell = new Cell(blueAllianceStats["frc" + team][dataIndex].value)
+      var cell = new Cell(blueAllianceStats["frc" + team][dataIndex].rank, blueAllianceStats["frc" + team][dataIndex].rank)
       cell.setBlue(true);
       row.addCell(cell);
     }
@@ -1005,7 +889,7 @@ var fieldsToShow = [];
 var ranksToShow = [];
 
 function tbaDialogInitialize() {
-  snackbar.labelText = "Getting Data. This may take a moment.";
+  snackbar.labelText = "Getting TBA Data. This may take a moment.";
   snackbar.open();
   getBlueAllianceStats().then(function () {
     var fieldList = document.getElementById("tuneList");
@@ -1148,4 +1032,147 @@ function csvExport() {
   downloader.setAttribute("href", "data:text/csv;charset=utf-8," + encodeURIComponent(pitCSV));
   downloader.setAttribute("download", "pit-data.csv");
   downloader.click();
+}
+class MatchPreview {
+  constructor(root){
+    this.tabComponent = new mdc.tabBar.MDCTabBar(root);
+    root.addEventListener("MDCTabBar:activated", this.handleTabChange);
+  }
+
+  async getAlliances(match){
+    this.alliances = {red:[], blue:[]};
+    var data = await getTBAData("https://www.thebluealliance.com/api/v3/match/" + match + "/simple");
+    if(data.Error){
+      snackbar.labelText = (data.Error.indexOf("does not exist") != -1) ? "There is no information on this match" : "An unexpected error occured";
+    }
+    for(var key of data.alliances.red.team_keys){
+      this.alliances.red.push(key.split("frc")[1]);
+    }
+    for(var key of data.alliances.blue.team_keys){
+      this.alliances.blue.push(key.split("frc")[1]);
+    }
+    this.level = data.comp_level;
+    this.number = data.match_number;
+    this.round = data.set_number;
+    return this.alliances;
+  }
+
+  open(match){
+    this.getAlliances(match).then(function(){
+      matchPreview.showAlliance(true);
+      title.innerText = MatchPreview.shorthand[match.split("_")[1].split("m")[0].replace(/[0-9]/g,"")] + ((match.split("_")[1].split("m")[0].replace(/[0-9]/g,"") != "q") ? (" Round " + match.split("_")[1].split("m")[0].replace(/[a-z]/g,"")) : "" )+ " Match " + match.split("_")[1].split("m")[1];
+      document.getElementById('tableContainer').classList.remove('appearing');
+      document.getElementById('tableContainer').classList.add('disappearing');
+      setTimeout(function () { document.getElementById('tableContainer').hidden = true; document.getElementById('tableContainer').classList.remove('disappearing'); WindowManager.handleWindowResize(windowManager)}, 200);
+      document.getElementById('match-view-tabs').hidden = false;
+      document.getElementById('window-container').hidden = false;
+      navButton.hidden = true;
+      document.getElementById("backButton").hidden = false
+      document.getElementById('eventButton').hidden = true;
+      document.getElementById("backButton").onclick = MatchPreview.close;
+    });
+  }
+  
+  handleTabChange(e){
+    switch(e.detail.index){
+      case 0:
+        matchPreview.showAlliance(true);
+        break;
+      case 1:
+        matchPreview.showAlliance(false);
+        break;
+    }
+  }
+  showAlliance(isRed){
+    windowManager.closeAllWindows();
+    document.documentElement.classList.value = "";
+    document.documentElement.classList.add(isRed ? "red" : "blue");
+    for(var team of isRed ? this.alliances.red : this.alliances.blue){
+      windowManager.addWindow(new Window(new TeamView(parseInt(team))));
+    }
+  }
+
+  static shorthand = {
+    "q" : "Qualification",
+    "sf" : "Semifinal",
+    "qf" : "Quarterfinal",
+    "f" : "Final"
+  }
+  static close() {
+    title.innerHTML = "View Data";
+    document.documentElement.classList.value = "";
+    navButton.hidden = false;
+    document.getElementById('newWindowButton').hidden = true;
+    document.getElementById('eventButton').hidden = false;
+    document.getElementById('tableContainer').classList.remove('disappearing')
+    document.getElementById("backButton").hidden = true;
+    document.getElementById("backButton").onclick = TeamView.close;
+    document.getElementById('match-view-tabs').hidden = true;
+    document.getElementById('tableContainer').hidden = false;
+    document.getElementById('window-container').classList.add('disappearing');
+    document.getElementById('tableContainer').classList.add('appearing');
+    setTimeout(function () { document.getElementById('tableContainer').classList.remove('appearing'); document.getElementById('window-container').classList.remove('disappearing'); document.getElementById('window-container').hidden = true; 
+      windowManager.closeAllWindows()
+    }, 200);
+  }
+}
+
+class matchPreviewDialog{
+  constructor(root){
+    this.root = root;
+    this.dialog = new mdc.dialog.MDCDialog(this.root);
+    this.select = new mdc.select.MDCSelect(this.root.querySelector(".mdc-select"));
+    this.listInit = false;
+  }
+
+  async open(){
+    this.dialog.open();
+    if(!this.listInit){
+      var data = await getTBAData("https://www.thebluealliance.com/api/v3/event/" + localStorage.getItem("currentEvent") + "/matches/keys");
+      this.list = this.root.querySelector(".mdc-deprecated-list");
+      var matches = this.interpretMatches(data);
+      for(var match of matches) {
+        var item = document.createElement("li");
+        item.classList.value = "mdc-deprecated-list-item";
+        item.setAttribute("role", "option")
+        item.innerHTML = '<span class="mdc-deprecated-list-item__text">' + match.name + '</span>';
+        item.dataset.value = match.key;
+        this.list.appendChild(item);
+      }
+      this.select.layoutOptions();
+      this.listInit = true;
+    }
+  }
+
+  interpretMatches(keys){
+    var matches = [];
+    for(var eventKey of keys){
+      var match = {};
+      match.key = eventKey;
+      match.number = eventKey.split("_")[1].split("m")[1];
+      var level = MatchPreview.shorthand[eventKey.split("_")[1].split("m")[0].replace(/[0-9]/g,"")];
+      match.level= eventKey.split("_")[1].split("m")[0].replace(/[0-9]/g,"");
+      if(eventKey.split("_")[1].split("m")[0].replace(/[0-9]/g,"") != "q"){
+        match.round = eventKey.split("_")[1].split("m")[0].replace(/[a-z]/g,"");
+        match.name = level + " Round " + match.round + " Match " + match.number;
+      }else{
+        match.name = level + " Match " + match.number;
+      }
+      matches.push(match);
+    }
+    matches.sort(function(a,b){
+      if(a.level != b.level){
+        return ["q","qf","sf","f"].indexOf(a.level) - ["q","qf","sf","f"].indexOf(b.level);
+      }else if(a.round && a.round != b.round){
+        return a.round - b.round;
+      }else{
+        return a.number - b.number;
+      }
+    });
+    return matches;
+  }
+
+  continue(){
+    matchPreview.open(this.select.value);
+  }
 }

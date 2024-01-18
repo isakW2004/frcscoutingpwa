@@ -93,6 +93,8 @@ class OnboardingManager {
                 }
             }
             progress.open();
+            var selectedAssignment = {type: "team", data:selectedTeams};
+            localStorage.setItem("selectedAssignment", JSON.stringify(selectedAssignment));
             fetchMatchesForTeams(selectedTeams).then(function () {
                 scoutingBoard();
                 progress.close();
@@ -108,7 +110,8 @@ class OnboardingManager {
             })
         } else if (this.currentView == "position") {
             progress.open();
-            console.log(parseInt(this.positionSelect.selectedChipIds[0].split("chip-position-")[1]));
+            var selectedAssignment = {type: "position", data:this.positionSelect.selectedChipIds[0].split("chip-position-")[1]};
+            localStorage.setItem("selectedAssignment", JSON.stringify(selectedAssignment));
             this.fetchTeams().then(() => {
                 fetchMatchesByPosition(parseInt(this.positionSelect.selectedChipIds[0].split("chip-position-")[1])).then(function () {
                     scoutingBoard();
@@ -151,8 +154,7 @@ function continueMatchScouting() {
 }
 
 function removeDuplicates(array) {
-    let unique = [...new Set(array)];
-    return unique;
+    return [...new Set(array)];
 }
 
 var matchDetails = new Object;
@@ -203,10 +205,13 @@ async function fetchMatchesByPosition(position) {
 function scoutingBoard() {
     matchesScouting = JSON.parse(localStorage.getItem("matchesScouting"));
     matchDetails = JSON.parse(localStorage.getItem("matchDetails"));
-    document.getElementById("matchscout").innerHTML = "<h2 class='text-center'>Qualifier Matches</h2>"
-    document.getElementById("matchscout").innerHTML += '<ul class="mdc-list mdc-list--two-line scoutlist">';
+    document.getElementById("scouting-board-container").innerHTML = "<h2 class='text-center'>Qualifier Matches</h2>"
+    document.getElementById("scouting-board-container").innerHTML += '<ul class="mdc-list mdc-list--two-line scoutlist">';
+    document.getElementById("button-container").classList.add("setup-container--hidden");
+    document.getElementById("loading-container").classList.add("setup-container--hidden");
+    document.getElementById("scouting-board-container").classList.remove("setup-container--hidden");
     if (matchesScouting == null) {
-        document.getElementById("matchscout").innerHTML = "<h2 class='text-center'>No Qualifier Matches Available</h2>"
+        document.getElementById("scouting-board-container").innerHTML = "<h2 class='text-center'>No Qualifier Matches Available</h2>"
         matchesScouting = [];
     }
     matchesScouting.sort(function (a, b) { return a - b });
@@ -217,11 +222,8 @@ function scoutingBoard() {
         listItem.onclick = function () {
             openMatchScoutForm(match);
         };
-        document.getElementById("matchscout").appendChild(listItem);
+        document.getElementById("scouting-board-container").appendChild(listItem);
     }
-    var ripples = [].map.call(document.querySelectorAll('.mdc-list-item'), function (el) {
-        return new mdc.ripple.MDCRipple(el);
-    });
     var fab = document.createElement("button");
     fab.classList.add("mdc-fab");
     fab.innerHTML = '  <div class="mdc-fab__ripple"></div><span class="mdc-fab__icon material-icons">add</span>';
@@ -234,7 +236,7 @@ function scoutingBoard() {
             openMatchScoutForm(parseInt(matchNumber));
         }
     }
-    document.getElementById("matchscout").appendChild(fab);
+    document.getElementById("scouting-board-container").appendChild(fab);
 }
 
 function selectTab(tab) {
@@ -246,138 +248,6 @@ function selectTab(tab) {
         continuePit()
     }
 }
-
-const matchFields = [
-    {
-        "type": "number",
-        "title": "Cones Scored",
-        "id": "cones",
-        "weight": 2
-    },
-    {
-        "type": "number",
-        "title": "Marshmallows Scored",
-        "id": "cubes",
-        "weight": 1
-    },
-    {
-        "type": "checkbox",
-        "title": "Does Links",
-        "id": "links",
-    },
-    {
-        "type": "multi-select",
-        "title": "Autonomous",
-        "id": "auto",
-        "options": ["No Autonomous", "Autonomous did not work", "Left Community", "Scored", "Docked", "Engaged (Balanced)"]
-    },
-    {
-        "type": "dropdown",
-        "title": "Endgame",
-        "id": "endgame",
-        "options": ["No Endgame", "Parked within Community", "Docked", "Docked and Engaged"]
-    },
-    {
-        "type": "scale",
-        "title": "Rate the Performance",
-        "id": "rating",
-        "min": 1,
-        "max": 10
-    },
-    {
-        "type": "scale",
-        "title": "# Robots on Charge Station",
-        "id": "rcharge",
-        "min": 0,
-        "max": 3
-    },
-    {
-        "type": "text",
-        "title": "Comments",
-        "id": "comment",
-        "isTextArea": true,
-    },
-    {
-        "type": "checkbox",
-        "title": "Sustainability Bonus",
-        "id": "susBonus",
-    },
-    {
-        "type": "checkbox",
-        "title": "Activation Bonus",
-        "id": "activationBonus",
-    },
-    {
-        "type": "checkbox",
-        "title": "Match Won?",
-        "id": "won",
-    },
-];
-
-const pitFields = [
-    {
-        "type": "checkbox",
-        "title": "Can Do Cones",
-        "id": "cones",
-    },
-    {
-        "type": "checkbox",
-        "title": "Can Do Cubes",
-        "id": "cubes",
-    },
-    {
-        "type": "checkbox",
-        "title": "Can Pick Up From Floor",
-        "id": "floorPickup",
-    },
-    {
-        "type": "checkbox",
-        "title": "Can Pick Up and Score Tipped Cones",
-        "id": "tippedCones",
-    },
-    {
-        "type": "checkbox",
-        "title": "Can Pick Up From Human Player",
-        "id": "humanPlayer",
-    },
-    {
-        "type": "scale",
-        "title": "Robot Speed",
-        "id": "speed",
-        "min": 1,
-        "max": 5,
-    },
-    {
-        "type": "text",
-        "title": "Describe Grabber Mechanism",
-        "isTextArea": true,
-        "id": "grabber",
-    },
-    {
-        "type": "dropdown",
-        "title": "Drive Type",
-        "id": "drive",
-        "options": ["Tank", "West Coast Drive", "Swerve", "Mecanum", "Other (add comment)"]
-    },
-    {
-        "type": "multi-select",
-        "title": "Autonomous Strategy",
-        "id": "auto",
-        "options": ["No Autonomous", "Leaving Community", "Scored", "Dock", "Engage (Balance)"]
-    },
-    {
-        "type": "dropdown",
-        "title": "Endgame Strategy",
-        "id": "endgame",
-        "options": ["Parking", "Dock w/ No Auto Engaging", "Dock w/ Auto Engaging"]
-    },
-    {
-        "type": "text",
-        "title": "Comments",
-        "isTextArea": true,
-        "id": "comment",
-    },
-]
 
 var pitCheckboxes;
 var checkedItems;
@@ -589,10 +459,16 @@ function openPitScoutForm(team) {
 }
 
 function addTeamToMatch() {
-    //TODO: Make this a little less ugly
     var team = window.prompt("Enter team number");
     if (typeof allTeams.find(el => el.team_number == parseInt(team)) != "undefined") {
         scoutDialog.root.querySelector("form").appendChild(makeTeamFormRow(parseInt(team), true));
+        for(var row of allFormRows){
+            for(var field of row.fields){
+                if(field[2] == "scale"){
+                    field[1].layout();
+                }
+            }
+        }
     } else {
         snackbar.labelText = "Team " + team + " isn't at this event.";
         snackbar.open();
@@ -883,4 +759,55 @@ function nativeShare() {
         snackbar.labelText = "Unable to share scouting data.";
         snackbar.open();
     }
+}
+
+async function refreshSchedule(){
+    var selectedAssignment = JSON.parse(localStorage.getItem("selectedAssignment"));
+    progress.open();
+    if(selectedAssignment == null){
+        snackbar.labelText = "No assignment strategy was selected during setup.";
+        snackbar.open();
+        progress.close();
+        return;
+    }
+    if(!navigator.onLine){
+        snackbar.labelText = "You're offline.";
+        snackbar.open();
+        return;
+    }
+    matchDetails = new Object;
+    matchesScouting = [];
+    try{
+        switch(selectedAssignment.type){
+            case "team":
+                await fetchMatchesForTeams(selectedAssignment.data);
+                scoutingBoard();
+                break;
+            case "position":
+                await fetchMatchesByPosition(parseInt(selectedAssignment.data));
+                scoutingBoard();
+                break;
+        }
+        snackbar.labelText = "Match Schedule Refreshed";
+        snackbar.open();
+        progress.close()
+    }catch(e){
+        snackbar.labelText = "An error occured while refreshing the match schedule.";
+        console.log(e);
+        snackbar.open();
+        progress.close()
+    }
+}
+
+function redoOnboarding(){
+    matchDetails = new Object;
+    matchesScouting = [];
+    if(OnboardingManager.instance){
+        OnboardingManager.instance.strategySelect.destroy()
+        OnboardingManager.instance.positionSelect.destroy()
+        document.getElementById("teamcheck").innerHTML = "";
+    }
+    document.getElementById("scouting-board-container").classList.add("setup-container--hidden");
+    document.getElementById("button-container").classList.remove("setup-container--hidden");
+    new OnboardingManager(document.getElementById("onboarding"));
 }

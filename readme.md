@@ -21,7 +21,7 @@ Download your match scouting schedule directly from The Blue Alliance. When it's
 ## Basic Setup 
 Visit the link attached to this repository. Depending on your browser, the app may be able to be installed to the home screen. Swerve may prompt you to install it, otherwise use your browser's menus and select "Install App" or "Add to Home Screen".
 
-During set-up, Swerve will ask if you want to upload use a custom config file. You can create one using the information on the docs. Please note that the same config file will have to be uploaded on every scouter's device, or it may cause issues.
+During set-up, Swerve will ask if you want to upload use a custom config file. You can create one using the information on the docs. Please note that the same config file will have to be uploaded on every scouter's device, or there may be issues.
 
 To make scouting assignments, go to View Data and then click create match assignments.  There are two assignment strategies available: team and posiiton. Team assignments are good for small scouting subteams and/or those with high engagement from all members. Breaks are built in between assigned matches, and scouters can delegate difficult matches as needed.
 Position assignments use the driver's station position, and are good if your scouting subteam has around 6 active members at all times

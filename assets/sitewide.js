@@ -13,10 +13,12 @@ class EventPicker {
     return await getTBAData("https://www.thebluealliance.com/api/v3/team/frc" + team + "/events/" + now.getFullYear() + "/simple");
   }
   pickCustomEvent() {
-    var eventName = window.prompt("Enter custom Blue Alliance event code.\nFor example, the 2023 FIRST World Championship code is \"2023cmptx\"");
+    var eventName = window.prompt("Enter a custom Blue Alliance event code.\nFor example, the 2023 FIRST World Championship code is \"2023cmptx\"");
     if (eventName != null && eventName != "") {
+      var config = localStorage.getItem("config");
       localStorage.clear();
       localStorage.setItem("currentEvent", eventName);
+      localStorage.setItem("config", config);
       window.location.reload();
     }
   }
@@ -99,8 +101,10 @@ class EventPicker {
 
   confirmEvent() {
     if (this.value) {
+      var config = localStorage.getItem("config");
       localStorage.clear();
       localStorage.setItem("currentEvent", this.value);
+      localStorage.setItem("config", config);
       window.location.reload();
     } else {
       document.getElementById("event-picker__error-text").innerText = "Pick an event first";

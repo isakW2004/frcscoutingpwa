@@ -2,18 +2,18 @@
     "matchFields": [
         {
             "type": "number",
-            "title": "Cones Attempted",
-            "id": "cones"
+            "title": "Notes Scored In Amp",
+            "id": "amp"
         },
         {
             "type": "number",
-            "title": "Cubes Attempted",
-            "id": "cubes"
+            "title": "Notes Scored In Speaker",
+            "id": "speaker"
         },
         {
             "type": "checkbox",
-            "title": "Smart Cargo Placement (Links)",
-            "id": "links"
+            "title": "Cooperatition Bonus Attempted",
+            "id": "coop"
         },
         {
             "type": "multi-select",
@@ -22,22 +22,23 @@
             "options": [
                 "No Autonomous",
                 "Autonomous did not work",
-                "Left Community",
-                "Scored",
-                "Scored Multiple Pieces",
-                "Docked",
-                "Engaged (Balanced)"
+                "Left Starting Zone",
+                "Scored Note",
+                "Collected Notes",
+                "Scored Multiple Notes"
             ]
         },
         {
-            "type": "dropdown",
-            "title": "Endgame",
+            "type": "multi-select",
+            "title": "End of Game",
             "id": "endgame",
             "options": [
-                "No Endgame",
-                "Parked within Community",
-                "Docked",
-                "Docked and Engaged"
+                "No Points",
+                "Parked in Stage Zone",
+                "Hung On Stage",
+                "Harmonized (Shared Stage)",
+                "Note Scored in Trap",
+                "Human Player Spotlit"
             ]
         },
         {
@@ -49,50 +50,28 @@
         },
         {
             "type": "scale",
-            "title": "Robot Speed",
-            "id": "speed",
+            "title": "Cycle Efficiency",
+            "id": "cycle",
             "min": 1,
             "max": 5
-        },
-        {
-            "type": "scale",
-            "title": "# Robots on Charge Station",
-            "id": "rcharge",
-            "min": 0,
-            "max": 3
         },
         {
             "type": "text",
             "title": "Comments",
             "id": "comment",
             "isTextArea": true
-        },
-        {
-            "type": "checkbox",
-            "title": "Sustainability Bonus",
-            "id": "susBonus"
-        },
-        {
-            "type": "checkbox",
-            "title": "Activation Bonus",
-            "id": "activationBonus"
-        },
-        {
-            "type": "checkbox",
-            "title": "Match Won?",
-            "id": "won"
         }
     ],
     "pitFields": [
         {
             "type": "checkbox",
-            "title": "Can Do Cones",
-            "id": "cones"
+            "title": "Can Score in Amp",
+            "id": "amp"
         },
         {
             "type": "checkbox",
-            "title": "Can Do Cubes",
-            "id": "cubes"
+            "title": "Can Score in Speaker",
+            "id": "speaker"
         },
         {
             "type": "checkbox",
@@ -101,13 +80,8 @@
         },
         {
             "type": "checkbox",
-            "title": "Can Pick Up and Score Tipped Cones",
-            "id": "tippedCones"
-        },
-        {
-            "type": "checkbox",
-            "title": "Can Pick Up From Human Player",
-            "id": "humanPlayer"
+            "title": "Can Pick Up From Source",
+            "id": "source"
         },
         {
             "type": "text",
@@ -133,11 +107,10 @@
             "id": "auto",
             "options": [
                 "No Autonomous",
-                "Leaving Community",
-                "Score",
-                "Score Multiple Pieces",
-                "Dock",
-                "Engage (Balance)"
+                "Leaving Starting Zone",
+                "Scoring Note",
+                "Collecting Notes",
+                "Scoring Multiple Notes"
             ]
         },
         {
@@ -163,9 +136,9 @@
             "id": "comment"
         }
     ],
-    "gameName":"Charged Up",
-    "configName":"Charged Up Default",
-    "year":2023,
-    "desc":"Scout efficiently and effectively with the standard 2023 Swerve configuration",
+    "gameName":"Crescendo",
+    "configName":"Crescendo Default",
+    "year":2024,
+    "desc":"Scout efficiently and effectively with the standard 2024 Swerve configuration",
     "version":1.0
 }
