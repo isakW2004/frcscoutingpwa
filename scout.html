@@ -20,7 +20,6 @@
   <script type="text/javascript" src="assets/sitewide.js"></script>
   <script type="text/javascript" src="assets/genQRCode.js"></script>
   <meta name="description" content="Scouting and more for FRC Team 2530">
-  <script type="text/javascript" src="assets/jquery.js"></script>
   <meta name="color-scheme" content="dark light">
 </head>
 <script>
@@ -74,15 +73,11 @@
           <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
             <button href="#" class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button"
               data-mdc-auto-init="MDCRipple" id="menuButton">menu</button>
-            <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Change Event"
-              onclick="teamView.close()" id="backButton" hidden>arrow_back</button>
             <span class="mdc-top-app-bar__title" id="title">
               Scouting
             </span>
           </section>
           <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
-            <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Change Event"
-              id='eventButton' onclick="openEventPicker();">event</button>
             <div class=" mdc-menu-surface--anchor">
               <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button"
                 aria-label="Export and share data" onclick="shareMenu.open = true">ios_share</button>
@@ -108,6 +103,30 @@
                 </ul>
               </div>
             </div>
+            <div class=" mdc-menu-surface--anchor">
+              <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" id="menuBUtton"
+                onclick="optionsMenu.open = true" aria-label="More Options">more_vert</button>
+              <div class="mdc-menu mdc-menu-surface" id="optionsMenu">
+                <ul class="mdc-list mdc-list--icon-list" role="menu" aria-hidden="true" aria-orientation="vertical"
+                  tabindex="-1">
+                  <li class="mdc-list-item" role="menuitem" onclick="eventPicker.open()">
+                    <span class="mdc-list-item__icon material-icons">event</span>
+                    <span class="mdc-list-item__ripple"></span>
+                    <span class="mdc-list-item__text">Change Event</span>
+                  </li>
+                  <li class="mdc-list-item" role="menuitem" onclick="refreshSchedule()">
+                    <span class="mdc-list-item__icon material-icons">refresh</span>
+                    <span class="mdc-list-item__ripple"></span>
+                    <span class="mdc-list-item__text">Refresh Match Schedule</span>
+                  </li>
+                  <li class="mdc-list-item" role="menuitem" onclick="redoOnboarding()">
+                    <span class="mdc-list-item__icon material-icons">assignment</span>
+                    <span class="mdc-list-item__ripple"></span>
+                    <span class="mdc-list-item__text">New Assignment</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
         </div>
     </div>
     </section>
@@ -130,28 +149,45 @@
   </div>
 </body>
 
-<div class="mdc-dialog">
+<div class="mdc-dialog" id="event-picker">
   <div class="mdc-dialog__container">
-    <div class="mdc-dialog__surface" role="alertdialog" aria-modal="true" aria-labelledby="my-dialog-title"
-      aria-describedby="my-dialog-content">
-      <h2 class="mdc-dialog__title" id="my-dialog-title">Choose an Event<br>
-        <small class="text-muted text-center">Changing events will delete data on this device. <a
-            onclick="pickCustomEvent()">Custom
-            Event</a></small>
-      </h2>
-      <div class="mdc-dialog__content" id="my-dialog-content">
-        <ul class="mdc-list" id="eventlist">
-        </ul>
+    <div class="mdc-dialog__surface" role="alertdialog" aria-modal="true" aria-describedby="my-dialog-content">
+      <h2 class="mdc-dialog__title">Choose an Event<br></h2>
+      <div class="mdc-dialog__content">
+        <strong class="text-muted">Heads up! Changing events will clear scouting data on this device. Make sure you
+          export any important data before doing this.</strong><br>
+        <label class="mdc-text-field mdc-text-field--outlined">
+          <span class="mdc-notched-outline">
+            <span class="mdc-notched-outline__leading"></span>
+            <span class="mdc-notched-outline__notch">
+              <span class="mdc-floating-label">Your Team Number</span>
+            </span>
+            <span class="mdc-notched-outline__trailing"></span>
+          </span>
+          <input type="number" class="mdc-text-field__input">
+        </label>
+        <button class="mdc-button" id="team-submit-button">
+          <span class="mdc-button__ripple"></span>
+          <span class="mdc-button__indicator" hidden style="height:24px; width:24px;"></span>
+          <span class="mdc-button__icon material-icons">refresh</span>
+          <span class="mdc-button__text">Get Events</span>
+        </button>
+        <p id="event-picker__error-text"></p>
+        <div class="mdc-list mdc-list--two-line event-list mdc-form-field"></div>
       </div>
       <div class="mdc-dialog__actions">
         <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
           <div class="mdc-button__ripple"></div>
           <span class="mdc-button__label">Cancel</span>
         </button>
-        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="accept"
-          onclick="setEvent()">
+        <button class="mdc-button button--destructive" onclick="eventPicker.pickCustomEvent()">
+          <span class="mdc-button__ripple"></span>
+          <span class="mdc-button__text">Other Event</span>
+        </button>
+        <button type="button" class="mdc-button mdc-dialog__button mdc-button--raised button--destructive"
+          data-mdc-dialog-action="accept" onclick="eventPicker.confirmEvent()">
           <div class="mdc-button__ripple"></div>
-          <span class="mdc-button__label">OK</span>
+          <span class="mdc-button__label">Set Event</span>
         </button>
       </div>
     </div>
@@ -180,7 +216,7 @@
     document.body.addEventListener('MDCDrawer:closed', () => {
       mainContentEl.querySelector('input, button').focus();
     });
-    const eventPicker = new mdc.dialog.MDCDialog(document.querySelector('.mdc-dialog'));
+    const eventPicker = new EventPicker(document.getElementById("event-picker"));
     const progress = new mdc.linearProgress.MDCLinearProgress(document.getElementById("progressIndicator"))
   </script>
 
@@ -188,8 +224,8 @@
     <div class="mdc-tab-scroller">
       <div class="mdc-tab-scroller__scroll-area">
         <div class="mdc-tab-scroller__scroll-content">
-          <button class="mdc-tab mdc-tab--active" role="tab" id="standscouttab" aria-selected="true" tabindex="0"
-            onclick="selectTab('standscout')">
+          <button class="mdc-tab mdc-tab--active" role="tab" id="matchscouttab" aria-selected="true" tabindex="0"
+            onclick="selectTab('matchscout')">
             <span class="mdc-tab__content">
               <span class="mdc-tab__icon material-icons" aria-hidden="true">visibility</span>
               <span class="mdc-tab__text-label">Match</span>
@@ -216,36 +252,173 @@
   </div><br>
 
   <script type="text/javascript" src="assets/scout.js"></script>
-  <div id="standscout" onload="continueStand()" class="">
-    <div class="container text-center">
-      <h3 class="text-center">Choose which teams you are scouting.</h3><br>
-
-      <div class="teamcheck" id="teamcheck">
+  <div id="matchscout">
+    <div id="onboarding">
+      <div class="setup-container container setup-container--hidden" id="strategy-select-container">
+        <h3 class="text-center">Choose an assignment strategy</h3>
+        <div class="mdc-chip-set mdc-chip-set--choice" role="grid" id="strategy-select">
+          <div class="mdc-chip mdc-chip--with-primary-icon" role="row" id="position-based">
+            <div class="mdc-chip__ripple"></div>
+            <span class="mdc-chip__checkmark">
+              <svg class="mdc-chip__checkmark-svg" viewBox="-2 -3 30 30">
+                <path class="mdc-chip__checkmark-path" fill="none" stroke="black"
+                  d="M1.73,12.91 8.1,19.28 22.79,4.59" />
+              </svg>
+            </span>
+            <span role="gridcell">
+              <span role="button" tabindex="0" class="mdc-chip__primary-action">
+                <span class="mdc-chip__text">Position Based</span>
+              </span>
+            </span>
+          </div>
+          <div class="mdc-chip" role="row" id="team-based">
+            <div class="mdc-chip__ripple"></div>
+            <span class="mdc-chip__checkmark">
+              <svg class="mdc-chip__checkmark-svg" viewBox="-2 -3 30 30">
+                <path class="mdc-chip__checkmark-path" fill="none" stroke="black"
+                  d="M1.73,12.91 8.1,19.28 22.79,4.59" />
+              </svg>
+            </span>
+            <span role="gridcell">
+              <span role="button" tabindex="0" class="mdc-chip__primary-action">
+                <span class="mdc-chip__text">Team Based</span>
+              </span>
+            </span>
+          </div>
+          <div class="mdc-chip" role="row" id="skip-setup">
+            <div class="mdc-chip__ripple"></div>
+            <span class="mdc-chip__checkmark">
+              <svg class="mdc-chip__checkmark-svg" viewBox="-2 -3 30 30">
+                <path class="mdc-chip__checkmark-path" fill="none" stroke="black"
+                  d="M1.73,12.91 8.1,19.28 22.79,4.59" />
+              </svg>
+            </span>
+            <span role="gridcell">
+              <span role="button" tabindex="0" class="mdc-chip__primary-action">
+                <span class="mdc-chip__text">Skip Schedule Setup</span>
+              </span>
+            </span>
+          </div>
+        </div><br>
       </div>
-      <div class="mdc-touch-target-wrapper">
-        <button class="mdc-button mdc-button--outlined" onclick="fetchTeams()" id="fetch-button">
-          <div class="mdc-button__ripple"></div>
-          <i class="material-icons mdc-button__icon" aria-hidden="true">cached</i>
-          <span class="mdc-button__label" id="fetch-label">Fetch Teams</span>
-          <div class="mdc-button__touch"></div>
-        </button>
+      <div class="setup-container container setup-container--hidden" id="team-select-container">
+        <h3 class="text-center">Select teams to scout</h3><br>
+        <div class="teamcheck" id="teamcheck">
+        </div>
       </div>
-      <div class="mdc-touch-target-wrapper">
-        <button class="mdc-button mdc-button--raised" onclick="startScouting()">
-          <div class="mdc-button__ripple"></div>
-          <span class="mdc-button__label">Continue</span>
-          <div class="mdc-button__touch"></div>
-        </button>
-      </div><br><br>
-      <p class="text-center text-muted">You'll need internet access for this part.</p>
+      <div class="setup-container container setup-container--hidden" id="position-select-container">
+        <h3>Select your position</h3>
+        <div class="mdc-chip-set mdc-chip-set--choice" role="grid" id="position-select">
+          <div class="mdc-chip chip--blue" role="row" id="chip-position-1">
+            <div class="mdc-chip__ripple"></div>
+            <span class="mdc-chip__checkmark">
+              <svg class="mdc-chip__checkmark-svg" viewBox="-2 -3 30 30">
+                <path class="mdc-chip__checkmark-path" fill="none" stroke="black"
+                  d="M1.73,12.91 8.1,19.28 22.79,4.59" />
+              </svg>
+            </span>
+            <span role="gridcell">
+              <span role="button" tabindex="0" class="mdc-chip__primary-action">
+                <span class="mdc-chip__text">Blue 1</span>
+              </span>
+            </span>
+          </div>
+          <div class="mdc-chip chip--blue" role="row" id="chip-position-2">
+            <div class="mdc-chip__ripple"></div>
+            <span class="mdc-chip__checkmark">
+              <svg class="mdc-chip__checkmark-svg" viewBox="-2 -3 30 30">
+                <path class="mdc-chip__checkmark-path" fill="none" stroke="black"
+                  d="M1.73,12.91 8.1,19.28 22.79,4.59" />
+              </svg>
+            </span>
+            <span role="gridcell">
+              <span role="button" tabindex="0" class="mdc-chip__primary-action">
+                <span class="mdc-chip__text">Blue 2</span>
+              </span>
+            </span>
+          </div>
+          <div class="mdc-chip chip--blue" role="row" id="chip-position-3">
+            <div class="mdc-chip__ripple"></div>
+            <span class="mdc-chip__checkmark">
+              <svg class="mdc-chip__checkmark-svg" viewBox="-2 -3 30 30">
+                <path class="mdc-chip__checkmark-path" fill="none" stroke="black"
+                  d="M1.73,12.91 8.1,19.28 22.79,4.59" />
+              </svg>
+            </span>
+            <span role="gridcell">
+              <span role="button" tabindex="0" class="mdc-chip__primary-action">
+                <span class="mdc-chip__text">Blue 3</span>
+              </span>
+            </span>
+          </div>
+          <div class="mdc-chip chip--red" role="row" id="chip-position-4">
+            <div class="mdc-chip__ripple"></div>
+            <span class="mdc-chip__checkmark">
+              <svg class="mdc-chip__checkmark-svg" viewBox="-2 -3 30 30">
+                <path class="mdc-chip__checkmark-path" fill="none" stroke="black"
+                  d="M1.73,12.91 8.1,19.28 22.79,4.59" />
+              </svg>
+            </span>
+            <span role="gridcell">
+              <span role="button" tabindex="0" class="mdc-chip__primary-action">
+                <span class="mdc-chip__text">Red 1</span>
+              </span>
+            </span>
+          </div>
+          <div class="mdc-chip chip--red" role="row" id="chip-position-5">
+            <div class="mdc-chip__ripple"></div>
+            <span class="mdc-chip__checkmark">
+              <svg class="mdc-chip__checkmark-svg" viewBox="-2 -3 30 30">
+                <path class="mdc-chip__checkmark-path" fill="none" stroke="black"
+                  d="M1.73,12.91 8.1,19.28 22.79,4.59" />
+              </svg>
+            </span>
+            <span role="gridcell">
+              <span role="button" tabindex="0" class="mdc-chip__primary-action">
+                <span class="mdc-chip__text">Red 2</span>
+              </span>
+            </span>
+          </div>
+          <div class="mdc-chip chip--red" role="row" id="chip-position-6">
+            <div class="mdc-chip__ripple"></div>
+            <span class="mdc-chip__checkmark">
+              <svg class="mdc-chip__checkmark-svg" viewBox="-2 -3 30 30">
+                <path class="mdc-chip__checkmark-path" fill="none" stroke="black"
+                  d="M1.73,12.91 8.1,19.28 22.79,4.59" />
+              </svg>
+            </span>
+            <span role="gridcell">
+              <span role="button" tabindex="0" class="mdc-chip__primary-action">
+                <span class="mdc-chip__text">Red 3</span>
+              </span>
+            </span>
+          </div>
+        </div><br>
+      </div>
+      <div class="setup-container container" id="button-container">
+        <div class="mdc-touch-target-wrapper">
+          <button class="mdc-button mdc-button--raised" onclick="OnboardingManager.instance.handleContinueClick()">
+            <div class="mdc-button__ripple"></div>
+            <span class="mdc-button__label">Continue</span>
+            <div class="mdc-button__touch"></div>
+          </button>
+        </div><br><br>
+        <p class="text-center text-muted">You'll need internet access for now.</p>
+      </div>
     </div>
+    <div class="setup-container setup-container--hidden" id="loading-container">
+      <h1 class='loading'>Getting Ready</h1>
+    </div>
+    <div class="setup-container setup-container--hidden" id="scouting-board-container">
+    </div>
+  </div>
   </div>
   <div id="pitscout" class="d-none">
     <div class="container text-center">
       <h3 class="text-center">Pit Scouting</h3><br>
       <div class="teamcheck" id="teamcheck">
       </div>
-      <p class="text-center text-muted">Set up stand scouting then come back</p>
+      <p class="text-center text-muted">Set up match scouting then come back</p>
     </div>
   </div>
   <div class="mdc-snackbar">
@@ -261,7 +434,7 @@
         <div class="mdc-dialog__content" id="my-dialog-content">
           First, set up scouting. You'll need internet to get data from The Blue Alliance. Press Fetch Teams and check
           all the teams you want to scout. Once your done press continue. Tap the match you want to scout.<br><br> To
-          Pit Scout, set up stand scouting. As you scout, collaborate with other Pit Scouters and check the boxes of the
+          Pit Scout, set up match scouting. As you scout, collaborate with other Pit Scouters and check the boxes of the
           teams that have already been scouted. To scout, tap a team that has not been scouted to fill out the form.
         </div>
         <div class="mdc-dialog__actions">
@@ -364,36 +537,26 @@
   <script>
     const exportWindow = new mdc.dialog.MDCDialog(document.getElementById('exportWindow'));
     const scoutDialog = new mdc.dialog.MDCDialog(document.getElementById('scout-dialog'));
-    continueStand();
+    continueMatchScouting();
     const tabBar = new mdc.tabBar.MDCTabBar(document.querySelector('.mdc-tab-bar'));
     const tabIndicator = new mdc.tabIndicator.MDCTabIndicator(document.querySelector('.mdc-tab-indicator'));
     const snackbar = new mdc.snackbar.MDCSnackbar(document.querySelector('.mdc-snackbar'));
     const shareMenu = new mdc.menu.MDCMenu(document.getElementById("totallyNotAShareMenuAdblockerDoNotBlockMePlease"));
+    const optionsMenu = new mdc.menu.MDCMenu(document.getElementById("optionsMenu"));
     const qrDialog = new mdc.dialog.MDCDialog(document.getElementById('qrDialog'));
-    const customRangeText = new mdc.textField.MDCTextField(document.getElementById("customRange"))
+    const customRangeText = new mdc.textField.MDCTextField(document.getElementById("customRange"));
     if (navigator.share && navigator.canShare) {
       document.getElementById("notAShareButton").classList.remove("hidden");
     }
+    var pitFields;
+    var matchFields;
+
+    if (localStorage.getItem("config") == null) {
+      snackbar.labelText = "Swerve is not configured. Go back to the home page to choose a configuration.";
+      snackbar.open();
+    } else {
+      var config = JSON.parse(localStorage.getItem("config"));
+      pitFields = config.pitFields;
+      matchFields = config.matchFields;
+    }
   </script>
-  <style>
-    .checkmark-animation {
-      stroke-linecap: round;
-      stroke-dasharray: 27;
-      stroke-dashoffset: -23;
-      animation: dash 500ms ease forwards;
-      stroke: var(--mdc-theme-primary);
-    }
-
-    .checkmark-svg {
-      width: 60vw;
-      height: 60vw;
-      max-width: 500px;
-      max-height: 500px;
-    }
-
-    @keyframes dash {
-      to {
-        stroke-dashoffset: 0;
-      }
-    }
-  </style>

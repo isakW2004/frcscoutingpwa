@@ -9,8 +9,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="Swerve">
-  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#232323"/>
-  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#7DC834"/>
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#232323" />
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#7DC834" />
   <link rel="apple-touch-icon" href="assets/images/icon-512-mask.png">
   <title>Welcome - 2530 Scouting</title>
   <link rel="stylesheet" href="assets/bootstrapcustom.min.css">
@@ -19,7 +19,6 @@
   <link rel="stylesheet" href="assets/style.css">
   <script type="text/javascript" src="assets/sitewide.js"></script>
   <meta name="description" content="Scouting and more for FRC Team 2530">
-  <script type="text/javascript" src="assets/jquery.js"></script>
   <meta name="color-scheme" content="dark light">
 </head>
 <script>
@@ -35,6 +34,11 @@
     });
   }
 </script>
+<style>
+  #configCard {
+    padding: 16px;
+  }
+</style>
 
 <body>
   <div class="drawer-frame-root">
@@ -78,7 +82,7 @@
           <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
             <div id="toolbar" class="toolbar mdc-menu-surface--anchor">
               <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Change Event"
-                id='eventButton' onclick="openEventPicker();">event</button>
+                id='eventButton' onclick="eventPicker.open()">event</button>
             </div>
         </div>
         </section>
@@ -89,31 +93,96 @@
   </div>
 </body>
 
-<div class="mdc-dialog">
+<div class="mdc-dialog" id="event-picker">
   <div class="mdc-dialog__container">
-    <div class="mdc-dialog__surface" role="alertdialog" aria-modal="true" aria-labelledby="my-dialog-title"
-      aria-describedby="my-dialog-content">
-      <h2 class="mdc-dialog__title" id="my-dialog-title">Choose an Event<br>
-        <small class="text-muted text-center">Changing events will delete data on this device. <a onclick="pickCustomEvent()">Custom Event</a></small>
-      </h2>
-      <div class="mdc-dialog__content" id="my-dialog-content">
-        <ul class="mdc-list" id="eventlist">
-        </ul>
+    <div class="mdc-dialog__surface" role="alertdialog" aria-modal="true" aria-describedby="my-dialog-content">
+      <h2 class="mdc-dialog__title">Choose an Event<br></h2>
+      <div class="mdc-dialog__content">
+        <strong class="text-muted">Heads up! Changing events will clear scouting data on this device. Make sure you
+          export any important data before doing this.</strong><br>
+        <label class="mdc-text-field mdc-text-field--outlined">
+          <span class="mdc-notched-outline">
+            <span class="mdc-notched-outline__leading"></span>
+            <span class="mdc-notched-outline__notch">
+              <span class="mdc-floating-label">Your Team Number</span>
+            </span>
+            <span class="mdc-notched-outline__trailing"></span>
+          </span>
+          <input type="number" class="mdc-text-field__input">
+        </label>
+        <button class="mdc-button" id="team-submit-button">
+          <span class="mdc-button__ripple"></span>
+          <span class="mdc-button__indicator" hidden style="height:24px; width:24px;"></span>
+          <span class="mdc-button__icon material-icons">refresh</span>
+          <span class="mdc-button__text">Get Events</span>
+        </button>
+        <p id="event-picker__error-text"></p>
+        <div class="mdc-list mdc-list--two-line event-list mdc-form-field"></div>
       </div>
       <div class="mdc-dialog__actions">
         <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
           <div class="mdc-button__ripple"></div>
           <span class="mdc-button__label">Cancel</span>
         </button>
-        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="accept"
-          onclick="setEvent()">
+        <button class="mdc-button button--destructive" onclick="eventPicker.pickCustomEvent()">
+          <span class="mdc-button__ripple"></span>
+          <span class="mdc-button__text">Other Event</span>
+        </button>
+        <button type="button" class="mdc-button mdc-dialog__button mdc-button--raised button--destructive"
+          data-mdc-dialog-action="accept" onclick="eventPicker.confirmEvent()">
           <div class="mdc-button__ripple"></div>
-          <span class="mdc-button__label">OK</span>
+          <span class="mdc-button__label">Set Event</span>
         </button>
       </div>
     </div>
   </div>
   <div class="mdc-dialog__scrim"></div>
+</div>
+
+<div class="mdc-dialog" id="configDialog">
+  <div class="mdc-dialog__container">
+    <div class="mdc-dialog__surface" role="alertdialog" aria-modal="true">
+      <div class="mdc-dialog__header">
+        <h2 class="mdc-dialog__title">Change Config</h2>
+      </div>
+      <div class="mdc-dialog__content" style="overflow: hidden;"><br>
+        <div class="mdc-select mdc-select--outlined">
+          <div class=mdc-select__anchor><span class=mdc-notched-outline><span class=mdc-notched-outline__leading></span>
+              <span class=mdc-notched-outline__notch><span class=mdc-floating-label>Select Configuration</span>
+              </span><span class=mdc-notched-outline__trailing></span> </span><span
+              class=mdc-select__selected-text-container><span class="mdc-select__selected-text"></span> </span><span
+              class=mdc-select__dropdown-icon><svg class=mdc-select__dropdown-icon-graphic focusable=false
+                viewBox="7 10 10 5">
+                <polygon class=mdc-select__dropdown-icon-inactive fill-rule=evenodd points="7 10 12 15 17 10"
+                  stroke=none></polygon>
+                <polygon class=mdc-select__dropdown-icon-active fill-rule=evenodd points="7 15 12 10 17 15" stroke=none>
+                </polygon>
+              </svg></span></div>
+          <input type="file" class="invisible-input" id="configInput">
+          <div class="mdc-select__menu mdc-menu-surface mdc-menu-surface--fixed" role="listbox">
+            <ul class="mdc-deprecated-list">
+              <label class="mdc-deprecated-list-item" role="option" data-value="0" tabindex="-1" for="configInput"><span
+                  class="mdc-deprecated-list-item__icon material-icons">file_upload</span><span
+                  class="mdc-deprecated-list-item__text">Custom</span></label>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="mdc-dialog__actions">
+        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="cancel">
+          <div class="mdc-button__ripple"></div>
+          <span class="mdc-button__label">Cancel</span>
+        </button>
+        <button type="button" class="mdc-button mdc-dialog__button"
+          onclick="configManager.continue()">
+          <div class="mdc-button__ripple"></div>
+          <span class="mdc-button__label">Continue</span>
+        </button>
+
+      </div>
+    </div>
+    <div class="mdc-dialog__scrim"></div>
+  </div>
 </div>
 <style id="display"></style>
 <main class="main-content" id="main-content" tabindex="-1">
@@ -137,13 +206,13 @@
     document.body.addEventListener('MDCDrawer:closed', () => {
       mainContentEl.querySelector('input, button').focus();
     });
-    const eventPicker = new mdc.dialog.MDCDialog(document.querySelector('.mdc-dialog'));
+    const eventPicker = new EventPicker(document.getElementById("event-picker"));
   </script>
   <div class="actions">
     <h2 class="welcome">Welcome to Swerve Scout</h2>
     <div class="tab">
       <h3 class="text-center">What would you like this device to do?</h1>
-        <div class="welcome-links container">
+        <div class="welcome-links">
           <a href="scout.html">
             <i class="material-icons">search</i>
             <h2>Scouting</h2>
@@ -158,10 +227,27 @@
           </a>
         </div><br>
     </div>
+    <hr>
+    <div class="tab">
+      <div class="mdc-card text-center" id="configCard">
+        <h4>Configuration</h4>
+        <h6>Loading...</h6>
+        <button type="button" class="mdc-button mdc-button--outlined" onclick="configManager.openDialog()">
+          <div class="mdc-button__ripple"></div>
+          <span class="mdc-button__label">Change Config</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="mdc-snackbar">
+    <div class="mdc-snackbar__surface">
+      <div class="mdc-snackbar__label" role="status" aria-live="polite">
+      </div>
+    </div>
   </div>
   <noscript class="text-center noscript">
     <h4><i class="material-icons align-bottom">error</i> Javascript Not Enabled</h4>
-    <p>Javascript is required for this website to function.</p>
+    <p>Javascript is required for Swerve to function.</p>
     <style>
       .actions {
         display: none;
@@ -171,10 +257,95 @@
 
   <script>
     var installButton = document.getElementById("installPrompt")
+    const snackbar = new mdc.snackbar.MDCSnackbar(document.querySelector('.mdc-snackbar'));
     window.addEventListener("beforeinstallprompt", function (beforeInstallPromptEvent) {
       installButton.addEventListener("click", function (mouseEvent) {
         beforeInstallPromptEvent.prompt();
       });
       installButton.hidden = false;
     });
+    class ConfigManager {
+      constructor(cardRoot, dialogRoot) {
+        console.log(cardRoot)
+        this.card = cardRoot;
+        this.dialog = new mdc.dialog.MDCDialog(dialogRoot);
+        this.select = new mdc.select.MDCSelect(dialogRoot.querySelector('.mdc-select'));
+        dialogRoot.querySelector("input").addEventListener("input", ConfigManager.handleInput);
+        this.configName = cardRoot.querySelector('h6');
+        this.updateText();
+        this.dialogInit = false;
+      }
+      async updateText() {
+        if (localStorage.getItem("config") == null) {
+          try{
+            this.defaults = await getTBAData("config/default-configs.json");
+            for (var d of this.defaults) {
+              if (d.default) {
+                await getTBAData(d.src).then(function (config) {
+                  localStorage.setItem("config", JSON.stringify(config))
+                })
+                break;
+              }
+            }
+          }catch{
+            this.configName.innerText = "Not Configured!";
+          }
+        }
+        this.config = JSON.parse(localStorage.getItem("config"));
+        this.configName.innerText = this.config.configName;
+      }
+      async openDialog() {
+        if (!this.dialogInit) {
+          if (!this.defaults) {
+            this.defaults = await getTBAData("config/default-configs.json");
+          }
+          var list = this.dialog.root.querySelector(".mdc-deprecated-list");
+          for (var i = 0; i < this.defaults.length; i++) {
+            var item = document.createElement("li");
+            item.classList.value = "mdc-deprecated-list-item";
+            item.setAttribute("role", "option")
+            item.innerHTML = '<span class="mdc-deprecated-list-item__text">' + this.defaults[i].year + ' ' + this.defaults[i].configName + '</span>';
+            item.dataset.value = i;
+            list.appendChild(item);
+          }
+          this.select.layoutOptions();
+          this.dialogInit = true;
+        }
+        this.dialog.open();
+      }
+
+      static async handleInput(e) {
+        try {
+          var value = JSON.parse(await e.target.files[0].text());
+          if (!(value.pitFields && value.matchFields && value.configName && value.year)) {
+            throw new Error("Invalid Swerve Config");
+          }
+          configManager.customValue = JSON.stringify(value);
+          configManager.select.selectedText.innerText = value.year + ' ' + value.configName;
+        } catch(e) {
+          console.log(e);
+          snackbar.labelText = "This file is not a valid Swerve configuration.";
+          snackbar.open();
+        }
+      }
+
+      async continue(){
+        if(configManager.select.selectedIndex == 0){
+          localStorage.setItem('config', this.customValue);
+        }else{
+          try{
+            localStorage.setItem('config', JSON.stringify(await getTBAData(this.defaults[configManager.select.selectedIndex - 1].src)));
+          }catch(e){
+            console.log(e);
+            snackbar.labelText = "There was an error getting the configuration.";
+            snackbar.open();
+            return;
+          }
+        }
+        snackbar.labelText = "Configuration set.";
+        snackbar.open();
+        this.dialog.close();
+      }
+    }
+    var configManager = new ConfigManager(document.getElementById("configCard"), document.getElementById("configDialog"));
   </script>

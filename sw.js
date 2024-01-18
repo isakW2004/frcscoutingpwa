@@ -3,7 +3,6 @@ var urlsToCache = [
   'assets/material.css',
   'assets/bootstrapcustom.min.css',
   'assets/material.js',
-  'assets/jquery.js',
   'assets/icons.woff2',
   'assets/style.css',
   'index.html',
@@ -27,7 +26,7 @@ var urlsToCache = [
   'assets/qrreader/qrcode.js',
   'assets/qrreader/rsdecoder.js',
   'assets/qrreader/version.js',
-  'assets/jquery.tablesorter.js'
+  'assets/masonry.js'
 ];
 
 self.addEventListener('install', function(event) {

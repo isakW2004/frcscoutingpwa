@@ -1,0 +1,144 @@
+{
+    "matchFields": [
+        {
+            "type": "number",
+            "title": "Notes Scored In Amp",
+            "id": "amp"
+        },
+        {
+            "type": "number",
+            "title": "Notes Scored In Speaker",
+            "id": "speaker"
+        },
+        {
+            "type": "checkbox",
+            "title": "Cooperatition Bonus Attempted",
+            "id": "coop"
+        },
+        {
+            "type": "multi-select",
+            "title": "Autonomous",
+            "id": "auto",
+            "options": [
+                "No Autonomous",
+                "Autonomous did not work",
+                "Left Starting Zone",
+                "Scored Note",
+                "Collected Notes",
+                "Scored Multiple Notes"
+            ]
+        },
+        {
+            "type": "multi-select",
+            "title": "End of Game",
+            "id": "endgame",
+            "options": [
+                "No Points",
+                "Parked in Stage Zone",
+                "Hung On Stage",
+                "Harmonized (Shared Stage)",
+                "Note Scored in Trap",
+                "Human Player Spotlit"
+            ]
+        },
+        {
+            "type": "scale",
+            "title": "Rate the Performance",
+            "id": "rating",
+            "min": 1,
+            "max": 10
+        },
+        {
+            "type": "scale",
+            "title": "Cycle Efficiency",
+            "id": "cycle",
+            "min": 1,
+            "max": 5
+        },
+        {
+            "type": "text",
+            "title": "Comments",
+            "id": "comment",
+            "isTextArea": true
+        }
+    ],
+    "pitFields": [
+        {
+            "type": "checkbox",
+            "title": "Can Score in Amp",
+            "id": "amp"
+        },
+        {
+            "type": "checkbox",
+            "title": "Can Score in Speaker",
+            "id": "speaker"
+        },
+        {
+            "type": "checkbox",
+            "title": "Can Pick Up From Floor",
+            "id": "floorPickup"
+        },
+        {
+            "type": "checkbox",
+            "title": "Can Pick Up From Source",
+            "id": "source"
+        },
+        {
+            "type": "text",
+            "title": "Describe Grabber Mechanism",
+            "isTextArea": true,
+            "id": "grabber"
+        },
+        {
+            "type": "dropdown",
+            "title": "Drive Type",
+            "id": "drive",
+            "options": [
+                "Tank",
+                "West Coast Drive",
+                "Swerve",
+                "Mecanum",
+                "Other (add comment)"
+            ]
+        },
+        {
+            "type": "multi-select",
+            "title": "Autonomous Abilities",
+            "id": "auto",
+            "options": [
+                "No Autonomous",
+                "Leaving Starting Zone",
+                "Scoring Note",
+                "Collecting Notes",
+                "Scoring Multiple Notes"
+            ]
+        },
+        {
+            "type": "text",
+            "title": "Describe Auto Presets",
+            "isTextArea": true,
+            "id": "autoPresets"
+        },
+        {
+            "type": "dropdown",
+            "title": "Endgame Strategy",
+            "id": "endgame",
+            "options": [
+                "Parking",
+                "Dock w/ No Auto Engaging",
+                "Dock w/ Auto Engaging"
+            ]
+        },
+        {
+            "type": "text",
+            "title": "Comments",
+            "isTextArea": true,
+            "id": "comment"
+        }
+    ],
+    "gameName":"Crescendo",
+    "configName":"Crescendo Default",
+    "year":2024,
+    "desc":"Scout efficiently and effectively with the standard 2024 Swerve configuration",
+    "version":1.0
+}

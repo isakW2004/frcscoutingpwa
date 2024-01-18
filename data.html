@@ -12,15 +12,13 @@
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#232323" />
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#7DC834" />
   <link rel="apple-touch-icon" href="assets/images/icon-512-mask.png">
-  <title>Welcome - 2530 Scouting</title>
+  <title>View Data</title>
   <link rel="stylesheet" href="assets/bootstrapcustom.min.css">
   <link href="assets/material.css" rel="stylesheet">
   <script type="text/javascript" src="assets/material.js"></script>
   <link rel="stylesheet" href="assets/style.css">
   <script type="text/javascript" src="assets/sitewide.js"></script>
   <meta name="description" content="Scouting and more for FRC Team 2530">
-  <script type="text/javascript" src="assets/jquery.js"></script>
-  <script type="text/javascript" src="assets/jquery.tablesorter.js"></script>
   <meta name="color-scheme" content="dark light">
   <!--QRCODEJS-->
   <script type="text/javascript" src="assets/qrreader/grid.js"></script>
@@ -40,20 +38,19 @@
   <script type="text/javascript" src="assets/qrreader/findpat.js"></script>
   <script type="text/javascript" src="assets/qrreader/alignpat.js"></script>
   <script type="text/javascript" src="assets/qrreader/databr.js"></script>
+  <script type="text/javascript" src="assets/masonry.js"></script>
 </head>
 <script>
-  if (localStorage.getItem('debugging') == null) {
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function () {
-        navigator.serviceWorker.register('sw.js').then(function (registration) {
-          // Registration was successful
-          console.log('ServiceWorker registration successful with scope: ', registration.scope);
-        }, function (err) {
-          // registration failed :(
-          console.log('ServiceWorker registration failed: ', err);
-        });
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').then(function (registration) {
+        // Registration was successful
+        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+      }, function (err) {
+        // registration failed :(
+        console.log('ServiceWorker registration failed: ', err);
       });
-    }
+    });
   }
 </script>
 
@@ -86,59 +83,98 @@
     </aside>
     <div class="mdc-drawer-scrim"></div>
 
-    <div class="drawer-main-content drawer-frame-app-content" id="main-content">
+    <div class="drawer-frame-app-content">
       <header class="mdc-top-app-bar drawer-top-app-bar head" data-mdc-auto-init="MDCTopAppBar" id="app-bar">
         <div class="mdc-top-app-bar__row">
           <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
             <button href="#" class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button"
               data-mdc-auto-init="MDCRipple" id="menuButton">menu</button>
             <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Change Event"
-              onclick="teamView.close()" id="backButton" hidden>arrow_back</button>
+              onclick="TeamView.close(true)" id="backButton" hidden>arrow_back</button>
             <span class="mdc-top-app-bar__title" id="title">View Data</span>
           </section>
-          <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
-            <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" id="favoriteButton"
-              aria-label="Favorite Team" hidden onclick="favoriteTeam()">favorite_outline</button>
+          <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end mdc-menu-surface--anchor"
+            role="toolbar">
+            <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" id="newWindowButton"
+              aria-label="Add Team To View" onclick="TeamView.newWindow()" hidden>add_box</button>
             <div id="toolbar" class="toolbar mdc-menu-surface--anchor">
               <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Change Event"
-                id='eventButton' onclick="openEventPicker();">event</button>
-              <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Consolidate Data"
-                id="consolidateButton" onclick="consolidateData();" hidden>call_merge</button>
-              <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" id="tuneButton" aria-label="Open Data Options"
-                onclick="tuneDialog.open()" hidden>tune</button>
+                id='eventButton' onclick="eventPicker.open()">event</button>
+              <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" id="menuBUtton"
+                onclick="optionsMenu.open = true" aria-label="More Options">more_vert</button>
+              <div class="mdc-menu mdc-menu-surface" id="optionsMenu">
+                <ul class="mdc-list mdc-list--icon-list" role="menu" aria-hidden="true" aria-orientation="vertical"
+                  tabindex="-1">
+                  <li class="mdc-list-item" role="menuitem" onclick="tbaDialog.open()">
+                    <span class="mdc-list-item__icon material-icons">auto_awesome</span>
+                    <span class="mdc-list-item__ripple"></span>
+                    <span class="mdc-list-item__text">Blue Alliance Menu</span>
+                  </li>
+                  <li class="mdc-list-item" role="menuitem" onclick="previewDialog.open()">
+                    <span class="mdc-list-item__icon material-icons">preview</span>
+                    <span class="mdc-list-item__ripple"></span>
+                    <span class="mdc-list-item__text">Match View</span>
+                  </li>
+                  <ul class="mdc-list-divider"></ul>
+                  <li class="mdc-list-item" role="menuitem" onclick="consolidateData()">
+                    <span class="mdc-list-item__icon material-icons">call_merge</span>
+                    <span class="mdc-list-item__ripple"></span>
+                    <span class="mdc-list-item__text">Consolidate Files</span>
+                  </li>
+                  <li class="mdc-list-item" role="menuitem" onclick="csvExport()">
+                    <span class="mdc-list-item__icon material-icons">border_all</span>
+                    <span class="mdc-list-item__ripple"></span>
+                    <span class="mdc-list-item__text">Export CSV</span>
+                  </li>
+                </ul>
+              </div>
             </div>
         </div>
         </section>
     </div>
     </header>
-
-    <div class="mdc-top-app-bar--fixed-adjust"></div>
   </div>
 </body>
 
-<div class="mdc-dialog">
+<div class="mdc-dialog" id="event-picker">
   <div class="mdc-dialog__container">
-    <div class="mdc-dialog__surface" role="alertdialog" aria-modal="true" aria-labelledby="my-dialog-title"
-      aria-describedby="my-dialog-content">
-      <!-- Title cannot contain leading whitespace due to mdc-typography-baseline-top() -->
-      <h2 class="mdc-dialog__title" id="my-dialog-title"><!--
-     -->Choose an Event<br>
-        <small class="text-muted text-center">Changing events will delete data on this device. <a onclick="pickCustomEvent()">Custom Event</a></small><!--
-   -->
-      </h2>
-      <div class="mdc-dialog__content" id="my-dialog-content">
-        <ul class="mdc-list" id="eventlist">
-        </ul>
+    <div class="mdc-dialog__surface" role="alertdialog" aria-modal="true" aria-describedby="my-dialog-content">
+      <h2 class="mdc-dialog__title">Choose an Event<br></h2>
+      <div class="mdc-dialog__content">
+        <strong class="text-muted">Heads up! Changing events will clear scouting data on this device. Make sure you
+          export any important data before doing this.</strong><br>
+        <label class="mdc-text-field mdc-text-field--outlined">
+          <span class="mdc-notched-outline">
+            <span class="mdc-notched-outline__leading"></span>
+            <span class="mdc-notched-outline__notch">
+              <span class="mdc-floating-label">Your Team Number</span>
+            </span>
+            <span class="mdc-notched-outline__trailing"></span>
+          </span>
+          <input type="number" class="mdc-text-field__input">
+        </label>
+        <button class="mdc-button" id="team-submit-button">
+          <span class="mdc-button__ripple"></span>
+          <span class="mdc-button__indicator" hidden style="height:24px; width:24px;"></span>
+          <span class="mdc-button__icon material-icons">refresh</span>
+          <span class="mdc-button__text">Get Events</span>
+        </button>
+        <p id="event-picker__error-text"></p>
+        <div class="mdc-list mdc-list--two-line event-list mdc-form-field"></div>
       </div>
       <div class="mdc-dialog__actions">
         <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close">
           <div class="mdc-button__ripple"></div>
           <span class="mdc-button__label">Cancel</span>
         </button>
-        <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="accept"
-          onclick="setEvent()">
+        <button class="mdc-button button--destructive" onclick="eventPicker.pickCustomEvent()">
+          <span class="mdc-button__ripple"></span>
+          <span class="mdc-button__text">Other Event</span>
+        </button>
+        <button type="button" class="mdc-button mdc-dialog__button mdc-button--raised button--destructive"
+          data-mdc-dialog-action="accept" onclick="eventPicker.confirmEvent()">
           <div class="mdc-button__ripple"></div>
-          <span class="mdc-button__label">OK</span>
+          <span class="mdc-button__label">Set Event</span>
         </button>
       </div>
     </div>
@@ -146,6 +182,33 @@
   <div class="mdc-dialog__scrim"></div>
 </div>
 <style id="display"></style>
+<div class="mdc-top-app-bar--fixed-adjust"></div>
+<div class="mdc-tab-bar" role="tablist" id="match-view-tabs" hidden>
+  <div class="mdc-tab-scroller">
+    <div class="mdc-tab-scroller__scroll-area">
+      <div class="mdc-tab-scroller__scroll-content">
+        <button class="mdc-tab mdc-tab--active" role="tab" aria-selected="true" tabindex="0">
+          <span class="mdc-tab__content">
+            <span class="mdc-tab__text-label">Red Alliance</span>
+          </span>
+          <span class="mdc-tab-indicator mdc-tab-indicator--active">
+            <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
+          </span>
+          <span class="mdc-tab__ripple"></span>
+        </button>
+        <button class="mdc-tab" role="tab" aria-selected="false" tabindex="-1">
+          <span class="mdc-tab__content">
+            <span class="mdc-tab__text-label">Blue Alliance</span>
+          </span>
+          <span class="mdc-tab-indicator">
+            <span class="mdc-tab-indicator__content mdc-tab-indicator__content--underline"></span>
+          </span>
+          <span class="mdc-tab__ripple"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 <main class="main-content" id="main-content" tabindex="-1">
   <script type="text/javascript">
     window.mdc.autoInit();
@@ -167,12 +230,12 @@
     document.body.addEventListener('MDCDrawer:closed', () => {
       mainContentEl.querySelector('input, button').focus();
     });
-    const eventPicker = new mdc.dialog.MDCDialog(document.querySelector('.mdc-dialog'));
+    const eventPicker = new EventPicker(document.getElementById("event-picker"));
   </script>
   <script type="text/javascript" src="assets/data.js"></script>
   <script src="assets/charts.js" crossorigin="anonymous"></script>
   <div class="main-tab" id="main-tab">
-    <h3>View Data</h3>
+    <h3><span style="vertical-align: bottom;font-size: 2rem;" class="material-icons">trending_up</span> View Data</h3>
     <p>Scan QR codes to download their data, or open a folder to view its contents. You can also view the scouting data
       on your current device.<br>You can collect data using a USB drive, AirDrop, Nearby Share, or QR Codes.</p>
     <div>
@@ -181,7 +244,7 @@
         <i class="material-icons mdc-button__icon" aria-hidden="true">folder</i>
         <span class="mdc-button__label">Open Files</span>
       </label>
-      <input type="file" webkitdirectory multiple id="folderSelect">
+      <input type="file" webkitdirectory multiple id="folderSelect" class="invisible-input">
       <button class="mdc-button mdc-button--icon-leading" onclick="initializeQrReader()">
         <span class="mdc-button__ripple"></span>
         <i class="material-icons mdc-button__icon" aria-hidden="true">qr_code_scanner</i>
@@ -195,17 +258,18 @@
       </button>
     </div>
   </div>
-  <div class="container" id='tableContainer' hidden><br>
+  <div class="container" id='tableContainer' hidden>
     <div class="mdc-data-table">
       <table class="mdc-data-table__table">
         <thead>
           <tr class="mdc-data-table__header-row" id="header-row">
-            <th class="mdc-data-table__header-cell" role="columnheader" scope="col" data-column-id="team" id="bigbrain">
+            <th class="mdc-data-table__header-cell mdc-data-table__header-cell--with-sort" role="columnheader"
+              scope="col" data-column-id="team">
               <div class="mdc-data-table__header-cell-wrapper">
                 <div class="mdc-data-table__header-cell-label">
                   Team
                 </div>
-                <div class="mdc-data-table__sort-status-label" aria-hidden="true" id="dessert-status-label">
+                <div class="mdc-data-table__sort-status-label" aria-hidden="true">
                 </div>
               </div>
             </th>
@@ -213,10 +277,9 @@
         <tbody class="mdc-data-table__content" id='tableBody'>
         </tbody>
       </table>
-
     </div>
-    <br><br>
   </div>
+  <div id="window-container" hidden></div>
   <div class="mdc-dialog mdc-dialog--fullscreen" id="qrDialog">
     <div class="mdc-dialog__container">
       <div class="mdc-dialog__surface" role="dialog" aria-modal="true">
@@ -234,6 +297,8 @@
           </div>
           <div>
             <h5 id="qrHelperText">Looking for QR Codes</h5>
+            <p><strong>Heads up!</strong> scanning large QR codes with this scanner can lead to data corruption and may
+              not work properly. For best results, try using AirDrop, Nearby Share, or Bluetooth File Transfer.</p>
             <div id="scannedData"></div>
           </div>
         </div>
@@ -250,9 +315,9 @@
     </div>
     <div class="mdc-dialog__scrim"></div>
   </div>
-  <div class="mdc-dialog" id="tuneDialog">
+  <div class="mdc-dialog" id="tbaDialog">
     <div class="mdc-dialog__container">
-      <div class="mdc-dialog__surface" role="alertdialog" aria-modal="true" aria-describedby="help-dialog-contents">
+      <div class="mdc-dialog__surface" role="alertdialog" aria-modal="true">
         <div class="mdc-dialog__header">
           <h2 class="mdc-dialog__title">Data Options</h2>
         </div>
@@ -277,14 +342,59 @@
     </div>
     <div class="mdc-dialog__scrim"></div>
   </div>
+  <div class="mdc-dialog" id="previewDialog">
+    <div class="mdc-dialog__container">
+      <div class="mdc-dialog__surface" role="alertdialog" aria-modal="true">
+        <div class="mdc-dialog__header">
+          <h2 class="mdc-dialog__title">Match View</h2>
+        </div>
+        <div class="mdc-dialog__content">
+          <div class="mdc-select mdc-select--outlined">
+            <div class=mdc-select__anchor><span class=mdc-notched-outline><span
+                  class=mdc-notched-outline__leading></span>
+                <span class=mdc-notched-outline__notch><span class=mdc-floating-label>Select a Match</span> </span><span
+                  class=mdc-notched-outline__trailing></span> </span><span
+                class=mdc-select__selected-text-container><span class="mdc-select__selected-text"></span> </span><span
+                class=mdc-select__dropdown-icon><svg class=mdc-select__dropdown-icon-graphic focusable=false
+                  viewBox="7 10 10 5">
+                  <polygon class=mdc-select__dropdown-icon-inactive fill-rule=evenodd points="7 10 12 15 17 10"
+                    stroke=none></polygon>
+                  <polygon class=mdc-select__dropdown-icon-active fill-rule=evenodd points="7 15 12 10 17 15"
+                    stroke=none>
+                  </polygon>
+                </svg></span></div>
+            <div class="mdc-select__menu mdc-menu-surface mdc-menu-surface--fixed" role="listbox">
+              <ul class="mdc-deprecated-list">
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="mdc-dialog__actions">
+          <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="cancel">
+            <div class="mdc-button__ripple"></div>
+            <span class="mdc-button__label">Cancel</span>
+          </button>
+          <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="close"
+            onclick="previewDialog.continue()">
+            <div class="mdc-button__ripple"></div>
+            <span class="mdc-button__label">Continue</span>
+          </button>
+
+        </div>
+      </div>
+      <div class="mdc-dialog__scrim"></div>
+    </div>
+  </div>
   <script>
     const selector = '.mdc-button, .mdc-icon-button, .mdc-card__primary-action, .mdc-list-item';
     const ripples = [].map.call(document.querySelectorAll(selector), function (el) {
       return new mdc.ripple.MDCRipple(el);
     });
-    var button = document.getElementById('menuButton')
+    var navButton = document.getElementById('menuButton')
     var title = document.getElementById('title')
     var qrDialog = new mdc.dialog.MDCDialog(document.getElementById("qrDialog"));
+    var optionsMenu = new mdc.menu.MDCMenu(document.getElementById("optionsMenu"));
+    var matchPreview = new MatchPreview(document.getElementById("match-view-tabs"));
     document.getElementById("folderSelect").addEventListener("change", function () {
       compileData(this.files);
     });
@@ -296,10 +406,8 @@
     }
 
     .mdc-card {
-      animation-name: slide-up;
-      animation-duration: 0.5s;
-      display: inline-block;
-      width: 100%;
+      width: 350px;
+      max-width: 100%;
     }
 
     @keyframes slide-up {
@@ -321,82 +429,46 @@
       margin-left: 0;
     }
 
-    @media (min-width:556px) {
-      .mdc-card-columns {
-        -webkit-column-count: 2;
-        -moz-column-count: 2;
-        column-count: 2;
-        -webkit-column-gap: 1.25rem;
-        -moz-column-gap: 1.25rem;
-        column-gap: 1.25rem;
-        orphans: 1;
-        widows: 1
-      }
-
-      .mdc-card-columns .mdc-card {
-        display: inline-block;
-        width: 100%
-      }
-    }
-
-    @media (min-width:900px) {
-      .mdc-card-columns {
-        -webkit-column-count: 3;
-        -moz-column-count: 3;
-        column-count: 3;
-        -webkit-column-gap: 1.25rem;
-        -moz-column-gap: 1.25rem;
-        column-gap: 1.25rem;
-        orphans: 1;
-        widows: 1
-      }
-
-      .mdc-card-columns .mdc-card {
-        display: inline-block;
-        width: 100%
-      }
-    }
-
     .mdc-card-columns {
       margin: 0px;
+      width: 100%;
+      animation-name: slide-up;
+      animation-duration: 0.5s;
     }
 
     .qr-result {
       padding: 10px;
     }
+
+    #teamInfoContainer {
+      display: flex;
+      max-width: 100%;
+      height: 100%;
+      justify-content: stretch;
+      overflow: hidden;
+    }
   </style>
-  <div class="container" id="teamInfoContainer" hidden>
-    <div class="mdc-card-columns" id="teamInfoColumns">
-
-    </div>
-
-  </div>
   <div class="mdc-snackbar" id="snackbar">
     <div class=mdc-snackbar__surface>
-      <div class=mdc-snackbar__label aria-live=polite role=status>There was an error</div>
+      <div class=mdc-snackbar__label aria-live=polite role=status></div>
     </div>
   </div>
   <script>
     const dataTable = new mdc.dataTable.MDCDataTable(document.querySelector('.mdc-data-table'));
     const snackbar = new mdc.snackbar.MDCSnackbar(document.getElementById('snackbar'));
-    const tuneDialog = new mdc.dialog.MDCDialog(document.getElementById("tuneDialog"));
+    const tbaDialog = new mdc.dialog.MDCDialog(document.getElementById("tbaDialog"));
+    const previewDialog = new matchPreviewDialog(document.getElementById("previewDialog"));
+    var windowManager = new WindowManager(document.getElementById("window-container"));
+    if (localStorage.getItem("config") == null) {
+      snackbar.labelText = "Swerve is not configured. Go back to the home page to choose a configuration.";
+      snackbar.open();
+    } else {
+      var config = JSON.parse(localStorage.getItem("config"));
+      pitFields = config.pitFields;
+      matchFields = config.matchFields;
+    }
   </script>
-  <br><br><br>
   <style>
-    .login {
-      display: block;
-      align-self: center;
-      margin-left: auto;
-      margin-right: auto;
-      width: 70vw;
-      max-width: 500px;
-    }
-
-    .mdc-text-field {
-      width: 90vw;
-      max-width: 400px;
-    }
-
     .table-actions {
       overflow-y: scroll;
       text-align: center;
@@ -405,19 +477,6 @@
 
     .mdc-button a {
       text-decoration: none;
-    }
-
-    .key {
-      padding-top: 20px;
-      columns: 4;
-      text-align: center;
-    }
-
-    .key-icon {
-      font-size: 50px;
-      font-family: 'Material Icons';
-      color: var(--mdc-theme-primary, black);
-      padding-bottom: 20px;
     }
 
     .disappearing {
@@ -467,11 +526,6 @@
       text-align: center;
     }
 
-    #folderSelect {
-      position: absolute;
-      top: -1000px;
-    }
-
     .pit-list-item .mdc-list-item__secondary-text {
       white-space: normal;
     }
@@ -484,5 +538,88 @@
     thead {
       position: sticky;
       top: 0;
+    }
+
+    @media print {
+      .mdc-top-app-bar {
+        display: none;
+      }
+
+      canvas {
+        max-width: 100%;
+      }
+
+      .container {
+        margin: 0;
+        width: 100%;
+      }
+    }
+
+    .data-card>* {
+      margin: 8px;
+    }
+
+    .window {
+      display: flex;
+      flex-grow: 1;
+      overflow-x: hidden;
+      flex-direction: column;
+      align-items: center;
+      padding: 15px 5px;
+      height: 100%;
+      overflow-y: scroll;
+    }
+
+    .window__resizer {
+      width: 5pt;
+      min-width: 5pt;
+      cursor: ew-resize;
+      background-color: lightgray;
+    }
+
+    .window__resizer:not(.window__resizer--active):hover {
+      background-color: var(--mdc-theme-primary);
+    }
+
+    .window__resizer--active {
+      background-color: #619a28;
+    }
+
+    .window__title {
+      font-weight: bold;
+      text-align: center;
+    }
+
+    html {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .main-content {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .chart-card {
+      align-items: center;
+      display: flex;
+    }
+
+    #window-container {
+      display: flex;
+      height: 100%;
+    }
+
+    #tableContainer {
+      height: 100%;
+      overflow-y: scroll;
+    }
+
+    .red {
+      --mdc-theme-primary: #da3434 !important;
+    }
+
+    .blue {
+      --mdc-theme-primary: #487fcc !important;
     }
   </style>
