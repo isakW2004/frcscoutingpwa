@@ -120,13 +120,15 @@
             "id": "autoPresets"
         },
         {
-            "type": "dropdown",
-            "title": "Endgame Strategy",
+            "type": "multi-select",
+            "title": "End of Game",
             "id": "endgame",
             "options": [
-                "Parking",
-                "Dock w/ No Auto Engaging",
-                "Dock w/ Auto Engaging"
+                "Park in Stage Zone",
+                "Hang On Stage",
+                "Harmonizing (Shared Stage)",
+                "Score Note in Trap",
+                "Human Player Spotlight"
             ]
         },
         {

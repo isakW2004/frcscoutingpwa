@@ -746,7 +746,7 @@ function nativeShare() {
     if (localStorage.getItem("pitData") != null) {
         files.push(new File([localStorage.getItem("pitData")], "pit-data" + (new Date).getTime() + ".json", { type: "application/json" }));
     }
-    var data = { files: files, title: "Scouting Data", text: "Here's some cool scouting data" };
+    var data = {files: files, title: "Scouting Data"};
     if (navigator.canShare(data)) {
         navigator.share(data).catch(err => {
             if (err.name != "AbortError") {
