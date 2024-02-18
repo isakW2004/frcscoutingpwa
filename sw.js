@@ -7,6 +7,7 @@ var urlsToCache = [
   'assets/style.css',
   'index.html',
   'scout.html',
+  'data.html',
   'assets/charts.js',
   'assets/genQRCode.js',
   'assets/qrreader/alignpat.js',
