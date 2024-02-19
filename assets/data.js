@@ -196,6 +196,7 @@ class TeamView{
     try{
       this.reconstruct();
     }catch(e){
+      console.log(e);
       snackbar.labelText = "There was an error opening team view. Make sure you are using the correct configuration.";
       snackbar.open();
       throw new Error(e);
@@ -228,7 +229,8 @@ class TeamView{
           }
         }
       }
-      if (pitData["team" + this.team]) {
+      if (pitData && pitData["team" + this.team]) {
+        console.log("pd=" + JSON.stringify(pitData));
         this.root.appendChild(this._makePitCard());
       }
       if(blueAllianceStats){
@@ -1032,6 +1034,17 @@ function csvExport() {
   downloader.setAttribute("href", "data:text/csv;charset=utf-8," + encodeURIComponent(pitCSV));
   downloader.setAttribute("download", "pit-data.csv");
   downloader.click();
+}
+function listUnscoutedPitTeams() {
+  let teams = allTeams.map(team => team['team_number']);
+  for (var key of Object.keys(pitData)) {
+    if (key.indexOf("team") == -1) {
+      continue;
+    }
+    const teamNumber = key.split("team")[1];
+    teams = teams.filter(t => t != teamNumber);
+  }
+  alert(JSON.stringify(teams));
 }
 class MatchPreview {
   constructor(root){
