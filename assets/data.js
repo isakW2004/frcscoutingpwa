@@ -22,27 +22,23 @@ function showData() {
     }
   }
   for (var team of allTeams) {
-    if (typeof matchData["team" + team.team_number] != "undefined" || typeof pitData["team" + team.team_number] != "undefined") {
-      var row = new Row(team);
-      var teamCell = new Cell(team.team_number, team.team_number + " " + team.nickname);
-      teamCell.setNumeric(false);
-      row.addCell(teamCell);
-      tableBody.appendChild(row.root);
-      for (var field of matchFields) {
-        if (field.type == 'number' || field.type == "scale") {
-          var cell = new Cell(getAverageOfMatch(field.id, team.team_number));
-          row.addCell(cell)
-        } else if (field.type == 'checkbox') {
-          if (matchData["team" + team.team_number]) {
-            var cell = new Cell(checkboxes.getPercentage(field.id, team.team_number, 'match'), checkboxes.getPercentage(field.id, team.team_number, 'match').toLocaleString("en-US", { style: "percent" }));
-          } else {
-            var cell = new Cell(-1, "-");
-          }
-          row.addCell(cell)
+    var row = new Row(team);
+    var teamCell = new NameCell(team.team_number, team.team_number + " " + team.nickname, _getNameTags(team));
+    teamCell.setNumeric(false);
+    row.addCell(teamCell);
+    tableBody.appendChild(row.root);
+    for (var field of matchFields) {
+      if (field.type == 'number' || field.type == "scale") {
+        var cell = new Cell(getAverageOfMatch(field.id, team.team_number));
+        row.addCell(cell)
+      } else if (field.type == 'checkbox') {
+        if (matchData["team" + team.team_number]) {
+          var cell = new Cell(checkboxes.getPercentage(field.id, team.team_number, 'match'), checkboxes.getPercentage(field.id, team.team_number, 'match').toLocaleString("en-US", { style: "percent" }));
+        } else {
+          var cell = new Cell(-1, "-");
         }
+        row.addCell(cell)
       }
-    } else {
-      skippedTeams.push(team.team_number + ' ' + team.nickname);
     }
   }
   document.addEventListener("MDCDataTable:sorted", function (detail) {
@@ -57,6 +53,17 @@ function showData() {
     }
     console.log(Row.allRows);
   })
+}
+
+function _getNameTags(team){
+  var tags = [];
+  if(typeof matchData["team" + team.team_number] == "undefined"){
+    tags.push("visibility_off")
+  }
+  if(typeof pitData["team" + team.team_number] == "undefined"){
+    tags.push("assignment_late")
+  }
+  return tags;
 }
 
 function getAverageOfMatch(id, number) {
@@ -178,6 +185,53 @@ class WindowManager{
   closeAllWindows(){
     this.root.innerHTML = "";
     this.windows = [];
+  }
+
+  static open(instance) {
+    document.getElementById('tableContainer').classList.remove('appearing');
+    document.getElementById('tableContainer').classList.add('disappearing');
+    setTimeout(function () { document.getElementById('tableContainer').hidden = true; document.getElementById('tableContainer').classList.remove('disappearing') }, 200);
+    document.getElementById('window-container').hidden = false;
+    if(instance){
+      windowManager.addWindow(new Window(instance));
+    }
+    title.innerHTML = "Team View";
+    navButton.hidden = true;
+    document.getElementById("backButton").hidden = false
+    document.getElementById('newWindowButton').hidden = false;
+    document.getElementById('eventButton').hidden = true;
+  }
+
+  static close(purge) {
+    title.innerHTML = "View Data";
+    navButton.hidden = false;
+    document.getElementById('newWindowButton').hidden = true;
+    document.getElementById('eventButton').hidden = false;
+    document.getElementById('tableContainer').classList.remove('disappearing')
+    document.getElementById("backButton").hidden = true;
+    document.getElementById('tableContainer').hidden = false;
+    document.getElementById('window-container').classList.add('disappearing');
+    document.getElementById('tableContainer').classList.add('appearing');
+    setTimeout(function () { document.getElementById('tableContainer').classList.remove('appearing'); document.getElementById('window-container').classList.remove('disappearing'); document.getElementById('window-container').hidden = true; 
+      if(purge){
+        windowManager.closeAllWindows()
+      }
+    }, 200);
+  }
+}
+
+class InfoView{
+  constructor(title, text, actions){
+    this.root = document.createElement("div");
+    this.title = title;
+    this.root.innerText = text + "\n";
+    for(var action of actions){
+      var button = document.createElement("button");
+      button.innerHTML = '<span class="mdc-button__ripple"></span><span class="mdc-button__label">'+action.name+'</span>';
+      button.classList.add("mdc-button");
+      button.onclick = action.onclick;
+      this.root.appendChild(button);
+    }
   }
 }
 
@@ -405,38 +459,9 @@ class TeamView{
     return title;
   }
 
-  static open(instance) {
-    document.getElementById('tableContainer').classList.remove('appearing');
-    document.getElementById('tableContainer').classList.add('disappearing');
-    setTimeout(function () { document.getElementById('tableContainer').hidden = true; document.getElementById('tableContainer').classList.remove('disappearing') }, 200);
-    document.getElementById('window-container').hidden = false;
-    windowManager.addWindow(new Window(instance));
-    title.innerHTML = "Team View";
-    navButton.hidden = true;
-    document.getElementById("backButton").hidden = false
-    document.getElementById('newWindowButton').hidden = false;
-    document.getElementById('eventButton').hidden = true;
-  }
-
-  static close(purge) {
-    title.innerHTML = "View Data";
-    navButton.hidden = false;
-    document.getElementById('newWindowButton').hidden = true;
-    document.getElementById('eventButton').hidden = false;
-    document.getElementById('tableContainer').classList.remove('disappearing')
-    document.getElementById("backButton").hidden = true;
-    document.getElementById('tableContainer').hidden = false;
-    document.getElementById('window-container').classList.add('disappearing');
-    document.getElementById('tableContainer').classList.add('appearing');
-    setTimeout(function () { document.getElementById('tableContainer').classList.remove('appearing'); document.getElementById('window-container').classList.remove('disappearing'); document.getElementById('window-container').hidden = true; 
-      if(purge){
-        windowManager.closeAllWindows()
-      }
-    }, 200);
-  }
   static newWindow(){
     if(windowManager.root.offsetWidth >= (windowManager.windows.length + 1) * 375){
-      TeamView.close(false);
+      WindowManager.close(false);
       snackbar.labelText = "Select a team to split view";
       snackbar.open();
     }else{
@@ -521,129 +546,209 @@ const dropdown = {
   }
 }
 
-var qrCtx;
-var videoStream;
-var qrStopped = false;
-
-function initializeQrReader() {
-  navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: "environment" } }).then(function (stream) {
-    videoStream = stream;
-    document.getElementById("qr-v").srcObject = videoStream;
-    document.getElementById("qr-v").play();
-    qrCtx = document.getElementById("qr-canvas").width = 800;
-    qrCtx = document.getElementById("qr-canvas").height = 600;
-    qrCtx = document.getElementById("qr-canvas").getContext("2d");
-    qrcode.callback = qrCodeDetected;
-    readQR();
-    qrDialog.open();
-  }).catch(function (err) {
-    console.log(err);
-    snackbar.labelText = "Error opening camera.";
-    snackbar.open();
-  });
+function drawImageScaled(img, ctx, imgWidth, imgHeight) {
+  var canvas = ctx.canvas ;
+  var hRatio = canvas.width  / imgWidth    ;
+  var vRatio =  canvas.height / imgHeight  ;
+  var ratio  = Math.min ( hRatio, vRatio );
+  var centerShift_x = ( canvas.width - imgWidth*ratio ) / 2;
+  var centerShift_y = ( canvas.height - imgHeight*ratio ) / 2;  
+  ctx.clearRect(0,0,canvas.width, canvas.height);
+  ctx.drawImage(img, 0,0, imgWidth, imgHeight,
+                     centerShift_x,centerShift_y,imgWidth*ratio, imgHeight*ratio);  
 }
 
-var codesScanned = 0;
-var scannedCodesData = [];
-var scannedCodesText = [];
-
-function qrCodeDetected(text) {
-  var qrHelperText = document.getElementById("qrHelperText");
-  var scannedDataEl = document.getElementById("scannedData");
-  var data;
-  try {
-    data = JSON.parse(text);
-    if (text != scannedCodesText[scannedCodesText.length - 1]) {
-      var listItem = document.createElement("li");
-      codesScanned++;
-      var card = document.createElement("div");
-      card.classList.value = "mdc-card qr-result";
-      card.innerHTML = '<h5>Code ' + codesScanned + '</h5><ul></ul>';
-      var list = card.querySelector("ul");
-      if (Array.isArray(data)) {
-        var team = data[0].team;
-        var matchNums = [];
-        for (var match of data) {
-          if (typeof match.matchNumber != "undefined") {
-            matchNums.push(match.matchNumber);
-          }
-        }
-        listItem.innerText = "Team " + team + "- Matches " + matchNums.join(", ");
-        list.appendChild(listItem);
-      } else {
-        for (var key of Object.keys(data)) {
-          var listItem = document.createElement("li");
-          if (key == "type") {
-            listItem.innerText = "Contains " + data[key] + " data.";
-          } else {
-            listItem.innerText = "Team " + key.split("team")[1];
-          }
-          list.appendChild(listItem);
-        }
-      }
-      scannedCodesData.push(data);
-      scannedCodesText.push(text);
-      scannedDataEl.appendChild(card);
-    } else {
-      console.log("Same QR detected")
-    }
-  } catch (err) {
-    qrHelperText.innerText = "Error! Invalid QR Code. Currently looking for QR codes.";
-    console.log([text, err]);
+class QRReader{
+  constructor(callback){
+    this.codesScanned = 0;
+    this.codeData = [];
+    this.lastText;
+    qrcode.callback = callback || ((text) => {
+      QRReader.handleDetection(text, this);
+    });
+    this.canvas = document.createElement("canvas");
+    this.canvas.width = 800;
+    this.canvas.height = 600;
+    this.ctx = this.canvas.getContext("2d");
   }
-}
 
-function saveQRData() {
-  var totalPitData = new Object;
-  var totalMatchData = new Object;
-  for (var data of scannedCodesData) {
-    if (Array.isArray(data)) {
-      var team = data[0].team
-      data.splice(0, 1);
-      totalMatchData["team" + team] = data;
-    } else {
-      for (var key of Object.keys(data)) {
-        if (key != "type") {
-          totalPitData[key] = data[key];
-        }
-      }
-    }
+  handleError(text){
+    console.log(text)
   }
-  var downloader = document.getElementById("dataDownloader");
-  downloader.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(totalMatchData)));
-  downloader.setAttribute("download", "match-data.json");
-  downloader.click();
-  downloader.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(totalPitData)));
-  downloader.setAttribute("download", "pit-data.json");
-  downloader.click();
-  stopQR();
-}
-function readQR() {
-  if (!qrStopped) {
-    try {
-      qrCtx.drawImage(document.getElementById("qr-v"), 0, 0);
+
+  static handleDetection(text, context){
+    if(text == context.lastText){
+      context.handleError("Same QR Code Detected");
+      return false;
+    }
+    var data;
+    try{
+      data = JSON.parse(text);
+    }catch{
+      context.handleError("Invalid JSON");
+      return false;
+    }
+    context.lastText = text;
+    context.codesScanned++;
+    context.codeData.push(data);
+    return true;
+  }
+
+  read(img){
       try {
-        qrcode.decode();
+        drawImageScaled(img,this.ctx, img.width, img.height)
+        qrcode.decode(this.canvas);
       }
       catch (e) {
         console.log(e);
-      } finally {
-        setTimeout(readQR, 500);
+      };
+  }
+
+  readAsync(img){
+    return new Promise((resolve) =>{
+      var callback = qrcode.callback;
+      qrcode.callback = (text) =>{
+        qrcode.callback = callback;
+        resolve(QRReader.handleDetection(text, this));
+      }
+      try {
+        drawImageScaled(img,this.ctx, img.width, img.height)
+        qrcode.decode(this.canvas);
+      }
+      catch (e) {
+        console.log(e);
+        resolve(false)
+      };
+    })
+  }
+
+  getData(){
+    var totalData = {matchData:{}, pitData:{}};
+    for(var data of this.codeData){
+      if(Array.isArray(data)){
+        var team = data[0].team;
+        data.splice(0, 1);
+        totalData.matchData["team" + team] = data;
+      }else{
+        for(var key of Object.keys(data)){
+          if(key != "type"){
+            totalData.pitData[key] = data[key];
+          }
+        }
       }
     }
-    catch (e) {
-      console.log(e);
-      setTimeout(readQR, 500);
-    };
+    return totalData;
+  }
+  static downloadData(instance){
+    var downloader = document.getElementById("dataDownloader");
+    var data = instance.getData()
+    downloader.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data.matchData)));
+    downloader.setAttribute("download", "qrmatch-data.json");
+    downloader.click();
+    downloader.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data.pitData)));
+    downloader.setAttribute("download", "qr-pit-data.json");
+    downloader.click();
   }
 }
 
-function stopQR() {
-  qrStopped = true;
-  document.getElementById("qr-v").pause();
-  document.getElementById("qr-v").src = "";
-  videoStream.getTracks().forEach(function (track) {
-    track.stop();
+class QRScanner extends QRReader{
+  constructor(video, callback){
+    super(callback);
+    this.video = video;
+    this.initialize();
+  }
+  async initialize(){
+    this.stream = await navigator.mediaDevices.getUserMedia({audio:false, video:{facingMode: "environment"}});
+    this.video.srcObject = this.stream;
+    this.video.play();
+    this.stopped = false;
+  }
+  stop(){
+    this.stopped = true;
+    this.video.pause();
+    this.video.src = "";
+    this.stream.getTracks().forEach(function (track) {
+      track.stop();
+    })
+  }
+  read(){
+    try {
+      drawImageScaled(this.video,this.ctx, this.video.videoWidth, this.video.videoHeight)
+      qrcode.decode(this.canvas);
+    }
+    catch (e) {
+      console.log(e);
+    };
+    if(!this.stopped){
+      setTimeout(()=>{
+        this.read()
+      }, 500);
+    }
+  }
+  static initializeScannerUI(){
+    var scanner = new QRScanner(document.getElementById("qr-v"), 
+    (text) => {
+      if(QRReader.handleDetection(text, scanner)){
+        var listItem = document.createElement("li");
+        var card = document.createElement("div");
+        card.classList.value = "mdc-card qr-result";
+        card.innerHTML = '<h5>Code ' + scanner.codesScanned + '</h5><ul></ul>';
+        var list = card.querySelector("ul");
+        var data = scanner.codeData[scanner.codeData.length - 1];
+        if (Array.isArray(data)) {
+          var team = data[0].team;
+          var matchNums = [];
+          for (var match of data) {
+            if (typeof match.matchNumber != "undefined") {
+              matchNums.push(match.matchNumber);
+            }
+          }
+          listItem.innerText = "Team " + team + "- Matches " + matchNums.join(", ");
+          list.appendChild(listItem);
+        } else {
+          for (var key of Object.keys(data)) {
+            var listItem = document.createElement("li");
+            if (key == "type") {
+              listItem.innerText = "Contains " + data[key] + " data.";
+            } else {
+              listItem.innerText = "Team " + key.split("team")[1];
+            }
+            list.appendChild(listItem);
+          }
+        }
+        document.getElementById("scannedData").appendChild(card);
+      }
+    });
+    qrDialog.open();
+    scanner.handleError = function(err){
+      document.getElementById("qrHelperText").innerText = err;
+    }
+    scanner.read();
+    document.getElementById("qr-dialog-close").onclick = scanner.stop;
+    document.getElementById("qr-save").onclick = () =>{
+      QRReader.downloadData(scanner);
+      scanner.stop();
+    }
+  }
+}
+
+function base64EncodeFile(file){
+  return new Promise((resolve) =>{
+    var reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () =>{
+      resolve(reader.result);
+    }
+  })
+}
+
+function loadImage(file){
+  return new Promise(async (resolve)=>{
+    var image = document.createElement("img");
+    image.src = await base64EncodeFile(file)
+    image.onload = function(){
+      resolve(image)
+    };
   })
 }
 
@@ -653,17 +758,30 @@ async function compileData(files) {
   var matchFileObjs = [];
   var pitFileObjs = [];
   try {
-    var i = 0;
+    var reader = new QRReader();
+    var skippedFiles = [];
     for await (const file of files) {
       if (file.type == "application/json") {
-        if (file.name.search("match") != -1) {
-          matchFileObjs.push(JSON.parse(await file.text()));
+        var fileContents = JSON.parse(await file.text());
+        if (Array.isArray(fileContents[Object.keys(fileContents)[0]])) {
+          matchFileObjs.push(fileContents);
         } else {
-          pitFileObjs.push(JSON.parse(await file.text()));
+          pitFileObjs.push(fileContents);
+        }
+      }else{
+        var image = await loadImage(file);
+        if(!(await reader.readAsync(image))){
+          skippedFiles.push(file.name);
         }
       }
-      i++;
     }
+    if(skippedFiles.length != 0){
+      snackbar.labelText = "Skipped " + skippedFiles.join(", ");
+      snackbar.open();
+    }
+    var qrData = reader.getData();
+    matchFileObjs.push(qrData.matchData);
+    pitFileObjs.push(qrData.pitData);
     for (var obj of matchFileObjs) {
       for (var key of Object.keys(obj)) {
         if (typeof matchData[key] == "undefined") {
@@ -804,12 +922,24 @@ class Cell {
   }
 }
 
+class NameCell extends Cell{
+  constructor(value, text, tags){
+    super(value, text)
+    for(var tagIcon of tags){
+      var tag = document.createElement("span");
+      tag.classList.value = "name-tag";
+      tag.innerText = tagIcon;
+      this.root.appendChild(tag)
+    }
+  }
+}
+
 class Row {
   constructor(team) {
     this.team = team;
     this.root = document.createElement("tr");
     this.root.classList.add("mdc-data-table__row");
-    this.root.onclick = () => TeamView.open(new TeamView(team.team_number));
+    this.root.onclick = () => WindowManager.open(new TeamView(team.team_number));
     this.cells = [];
     Row.allRows.push(this);
   }
@@ -1035,16 +1165,31 @@ function csvExport() {
   downloader.setAttribute("download", "pit-data.csv");
   downloader.click();
 }
-function listUnscoutedPitTeams() {
-  let teams = allTeams.map(team => team['team_number']);
-  for (var key of Object.keys(pitData)) {
-    if (key.indexOf("team") == -1) {
-      continue;
+function listUnscoutedTeams() {
+  var noPit = [], noMatch = [];
+  for(var team of allTeams){
+    if(typeof matchData["team" + team.team_number] == "undefined"){
+      noPit.push(team.team_number);
     }
-    const teamNumber = key.split("team")[1];
-    teams = teams.filter(t => t != teamNumber);
+    if(typeof pitData["team" + team.team_number] == "undefined"){
+      noMatch.push(team.team_number);
+    }
   }
-  alert(JSON.stringify(teams));
+  windowManager.addWindow(new Window(new InfoView("Unscouted Teams",
+    "Teams with no match data:\n" + noMatch.join(", ") + "\n\nTeams with no pit data:\n" + noPit.join(", "),
+    [{name: "Share", onclick:function(){
+      var data = {
+        text: "Teams with no match data:\n" + noMatch.join(", ") + "\n\nTeams with no pit data: \n" + noPit.join(", "), 
+        title: "Unscouted Teams"
+      };
+      if("share" in navigator && navigator.canShare(data)){
+        navigator.share(data).catch(function(err){
+          console.log(err);
+        });
+      }
+    }}]
+  )));
+  WindowManager.open();
 }
 class MatchPreview {
   constructor(root){
@@ -1119,7 +1264,7 @@ class MatchPreview {
     document.getElementById('eventButton').hidden = false;
     document.getElementById('tableContainer').classList.remove('disappearing')
     document.getElementById("backButton").hidden = true;
-    document.getElementById("backButton").onclick = TeamView.close;
+    document.getElementById("backButton").onclick = WindowManager.close;
     document.getElementById('match-view-tabs').hidden = true;
     document.getElementById('tableContainer').hidden = false;
     document.getElementById('window-container').classList.add('disappearing');

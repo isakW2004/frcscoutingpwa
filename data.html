@@ -90,7 +90,7 @@
             <button href="#" class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button"
               data-mdc-auto-init="MDCRipple" id="menuButton">menu</button>
             <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Change Event"
-              onclick="TeamView.close(true)" id="backButton" hidden>arrow_back</button>
+              onclick="WindowManager.close(true)" id="backButton" hidden>arrow_back</button>
             <span class="mdc-top-app-bar__title" id="title">View Data</span>
           </section>
           <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end mdc-menu-surface--anchor"
@@ -126,10 +126,10 @@
                     <span class="mdc-list-item__ripple"></span>
                     <span class="mdc-list-item__text">Export CSV</span>
                   </li>
-                  <li class="mdc-list-item" role="menuitem" onclick="listUnscoutedPitTeams()">
-                    <span class="mdc-list-item__icon material-icons">checklist</span>
+                  <li class="mdc-list-item" role="menuitem" onclick="listUnscoutedTeams()">
+                    <span class="mdc-list-item__icon material-icons">assignment_late</span>
                     <span class="mdc-list-item__ripple"></span>
-                    <span class="mdc-list-item__text">List unscouted pit teams</span>
+                    <span class="mdc-list-item__text">Teams Missing Data</span>
                   </li>
                 </ul>
               </div>
@@ -250,7 +250,7 @@
         <span class="mdc-button__label">Open Files</span>
       </label>
       <input type="file" webkitdirectory multiple id="folderSelect" class="invisible-input">
-      <button class="mdc-button mdc-button--icon-leading" onclick="initializeQrReader()">
+      <button class="mdc-button mdc-button--icon-leading" onclick="QRScanner.initializeScannerUI()">
         <span class="mdc-button__ripple"></span>
         <i class="material-icons mdc-button__icon" aria-hidden="true">qr_code_scanner</i>
         <span class="mdc-button__label">Scan QR Codes</span>
@@ -291,14 +291,13 @@
         <div class="mdc-dialog__header">
           <h2 class="mdc-dialog__title">Scan QR Codes</h2>
           <button class="mdc-icon-button material-icons mdc-dialog__close" data-mdc-dialog-action="close"
-            onclick="stopQR()">
+            id="qr-dialog-close">
             close
           </button>
         </div>
         <div class="mdc-dialog__content qr-dialog-container">
           <div>
             <video id="qr-v" style="max-width: 100%; max-height: 100%; overflow: hidden;"></video>
-            <canvas id="qr-canvas" hidden></canvas>
           </div>
           <div>
             <h5 id="qrHelperText">Looking for QR Codes</h5>
@@ -308,8 +307,8 @@
           </div>
         </div>
         <div class="mdc-dialog__actions">
-          <button type="button" id="saveButton" class="mdc-button mdc-dialog__button mdc-button--raised"
-            onclick="saveQRData()" data-mdc-dialog-action="ok" data-mdc-dialog-button-default>
+          <button type="button" id="qr-save" class="mdc-button mdc-dialog__button mdc-button--raised"
+            data-mdc-dialog-action="ok" data-mdc-dialog-button-default>
             <div class="mdc-button__ripple"></div>
             <span class="material-icons mdc-button__icon">save</span>
             <span class="mdc-button__label">Save</span>
@@ -626,5 +625,11 @@
 
     .blue {
       --mdc-theme-primary: #487fcc !important;
+    }
+
+    .name-tag {
+      font-family: "Material Icons";
+      vertical-align: sub;
+      margin: 5px;
     }
   </style>
